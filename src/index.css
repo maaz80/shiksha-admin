@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+}
+
+.open-sans {
+  font-family: "Open Sans", sans-serif;
+}
+.container {
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
