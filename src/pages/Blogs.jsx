@@ -67,7 +67,7 @@ export default function Blogs() {
           setDate(blog.date);
           setAuthor(blog.author);
           setContent(blog.content);
-
+          setImage(null);
           setSeoTitle(blog.seoTitle || "");
           setSeoDescription(blog.seoDescription || "");
           setSeoKeywords(blog.seoKeywords || "");
@@ -215,7 +215,7 @@ export default function Blogs() {
                                    {/* DESCRIPTION */}
                                    <div className="mb-4">
                                         <label className="block text-sm font-medium mb-1">
-                                        Description
+                                             Description
                                         </label>
 
                                         <textarea

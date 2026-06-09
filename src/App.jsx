@@ -9,6 +9,8 @@ import PageSEOManager from "./pages/PageSEOManager"
 import FaqManager from "./pages/Faq"
 import FooterManager from "./pages/FooterManager"
 import CompanyWorked from "./pages/CompanyWorked"
+import HomeData from "./pages/HomeData"
+import AboutData from "./pages/AboutData"
 
 const protectedPage = (page) => (
   <ProtectedRoute>
@@ -29,6 +31,8 @@ const App = () => {
         <Route path='/faq' element={protectedPage(<FaqManager />)} />
         <Route path='/footer' element={protectedPage(<FooterManager />)} />
         <Route path='/companies-worked' element={protectedPage(<CompanyWorked />)} />
+        <Route path='/home-data' element={protectedPage(<HomeData />)} />
+        <Route path='/about-data' element={protectedPage(<AboutData />)} />
         
       </Routes>
     </div>

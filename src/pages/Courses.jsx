@@ -13,6 +13,7 @@ export default function Courses() {
      const [showReviewsModal, setShowReviewsModal] = useState(false);
      const [selectedCourseForReviews, setSelectedCourseForReviews] = useState(null);
      const [reviewName, setReviewName] = useState("");
+     const [reviewRole, setReviewRole] = useState("");
      const [reviewRating, setReviewRating] = useState(5);
      const [reviewText, setReviewText] = useState("");
      const [reviewerImage, setReviewerImage] = useState(null);
@@ -181,6 +182,7 @@ export default function Courses() {
      const openReviewsModal = (course) => {
           setSelectedCourseForReviews(course);
           setReviewName("");
+          setReviewRole("");
           setReviewRating(5);
           setReviewText("");
           setReviewerImage(null);
@@ -201,6 +203,7 @@ export default function Courses() {
           try {
                const formData = new FormData();
                formData.append("name", reviewName);
+               formData.append("role", reviewRole);
                formData.append("rating", String(reviewRating));
                formData.append("text", reviewText);
                if (reviewerImage) {
@@ -216,6 +219,7 @@ export default function Courses() {
                     const updatedCourse = await res.json();
                     setSelectedCourseForReviews(updatedCourse);
                     setReviewName("");
+                    setReviewRole("");
                     setReviewRating(5);
                     setReviewText("");
                     setReviewerImage(null);
@@ -566,26 +570,7 @@ export default function Courses() {
                                                                            </div>
                                                                       </div>
 
-                                                                      <div className="flex flex-wrap gap-4 items-center text-sm text-gray-500">
-                                                                           <label className="flex items-center gap-2">
-                                                                                <input
-                                                                                     type="checkbox"
-                                                                                     checked={lesson.isPreview}
-                                                                                     onChange={(e) => updateLesson(i, j, "isPreview", e.target.checked)}
-                                                                                     className="accent-orange-500 w-3 h-3"
-                                                                                />
-                                                                                Preview
-                                                                           </label>
-                                                                           <label className="flex items-center gap-2">
-                                                                                <input
-                                                                                     type="checkbox"
-                                                                                     checked={!lesson.isLocked}
-                                                                                     onChange={(e) => updateLesson(i, j, "isLocked", !e.target.checked)}
-                                                                                     className="accent-orange-500 w-3 h-3"
-                                                                                />
-                                                                                Unlock
-                                                                           </label>
-                                                                      </div>
+
                                                                  </div>
                                                             ))}
 
@@ -659,7 +644,7 @@ export default function Courses() {
                                    {/* Add Review Form */}
                                    <form onSubmit={handleAddReview} className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-4">
                                         <h3 className="text-sm font-semibold text-gray-800">Add New Review</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                              <div>
                                                   <label className="block text-xs font-medium text-gray-500 mb-1">Reviewer Name</label>
                                                   <input
@@ -669,6 +654,16 @@ export default function Courses() {
                                                        onChange={(e) => setReviewName(e.target.value)}
                                                        className={inputClass}
                                                        required
+                                                  />
+                                             </div>
+                                             <div>
+                                                  <label className="block text-xs font-medium text-gray-500 mb-1">Reviewer Role</label>
+                                                  <input
+                                                       type="text"
+                                                       placeholder="e.g. Web Developer"
+                                                       value={reviewRole}
+                                                       onChange={(e) => setReviewRole(e.target.value)}
+                                                       className={inputClass}
                                                   />
                                              </div>
                                              <div>
@@ -741,6 +736,11 @@ export default function Courses() {
                                                                  <div className="space-y-1">
                                                                       <div className="flex flex-wrap items-center gap-2">
                                                                            <span className="font-semibold text-sm text-gray-800">{rev.name}</span>
+                                                                           {rev.role && (
+                                                                                <span className="text-[10px] font-medium text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">
+                                                                                     {rev.role}
+                                                                                </span>
+                                                                           )}
                                                                            <span className="flex items-center text-xs text-yellow-500">
                                                                                 {Array.from({ length: rev.rating || 5 }).map((_, i) => (
                                                                                      <svg key={i} xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>

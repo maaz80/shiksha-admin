@@ -20,6 +20,8 @@ const Home = () => {
                <Link to="/site-meta" className='bg-orange-600 px-10 py-3 rounded-2xl text-center w-100'>Site Meta</Link>
                <Link to="/faq" className='bg-orange-600 px-10 py-3 rounded-2xl text-center w-100'>Faq</Link>
                <Link to="/companies-worked" className='bg-orange-600 px-10 py-3 rounded-2xl text-center w-100'>Companies Worked</Link>
+               <Link to="/home-data" className='bg-orange-600 px-10 py-3 rounded-2xl text-center w-100'>Home Data</Link>
+               <Link to="/about-data" className='bg-orange-600 px-10 py-3 rounded-2xl text-center w-100'>About Data</Link>
           </div>
      )
 }
