@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Breadcrumb from '../components/BreadCrumb';
 
 const API_URL = import.meta.env?.VITE_BACKEND_URL || 'http://localhost:5000/api';
@@ -11,149 +11,81 @@ const PAGES = [
      { id: 'blogs', title: 'Blogs', slug: '/blogs' },
      { id: 'not-found', title: '404 Page', slug: '*' },
      { id: 'courses', title: 'Courses', slug: '/courses' },
-     // { id: 'careers', title: 'Careers', slug: '/careers' },
      { id: 'about-us', title: 'About Us', slug: '/about-us' },
 ];
 
-function PageRow({ page, seoData, onChange, onSave, saving, saved }) {
+function PageRow({ page, seoData, onChange, onSave, saving, saved, loading }) {
      return (
-          <div
-               style={{
-                    display: 'grid',
-                    gridTemplateColumns: '160px 1fr 1fr 1fr auto',
-                    gap: '10px',
-                    alignItems: 'center',
-                    padding: '12px 16px',
-                    borderBottom: '1px solid #f0f0f0',
-                    transition: 'background 0.15s',
-               }}
-               onMouseEnter={e => (e.currentTarget.style.background = '#fafafa')}
-               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-          >
+          <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr_auto] gap-6 items-center p-5 border-b border-gray-100 hover:bg-gray-50/50 transition-colors last:border-none">
                {/* Page Name */}
-               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span style={{ fontWeight: 600, fontSize: 13, color: '#1a1a1a' }}>{page.title}</span>
-                    <span style={{ fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' }}>{page.slug}</span>
+               <div className="flex flex-col gap-0.5 min-w-0">
+                    <span className="font-bold text-gray-900 text-sm truncate">{page.title}</span>
+                    <span className="text-xs text-gray-400 font-mono truncate">{page.slug}</span>
                </div>
 
-               {/* Meta Title */}
-               <div style={{ position: 'relative' }}>
-                    <input
-                         type="text"
-                         value={seoData.title}
-                         maxLength={60}
-                         onChange={e => onChange('title', e.target.value)}
-                         placeholder="Meta title..."
-                         style={{
-                              width: '100%',
-                              padding: '8px 10px',
-                              fontSize: 12,
-                              border: '1.5px solid #e5e7eb',
-                              borderRadius: 8,
-                              outline: 'none',
-                              color: '#374151',
-                              background: '#fff',
-                              boxSizing: 'border-box',
-                              transition: 'border-color 0.15s',
-                         }}
-                         onFocus={e => (e.target.style.borderColor = '#f97316')}
-                         onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
-                    />
-                    <span style={{
-                         position: 'absolute', right: 8, bottom: -16,
-                         fontSize: 10, color: seoData.title.length > 55 ? '#ef4444' : '#9ca3af'
-                    }}>
-                         {seoData.title.length}/60
-                    </span>
-               </div>
+               {loading ? (
+                    <div className="lg:col-span-2 h-10 bg-gray-150/60 animate-pulse rounded-xl w-full"></div>
+               ) : (
+                    <>
+                         {/* Meta Title */}
+                         <div className="relative">
+                              <input
+                                   type="text"
+                                   value={seoData.title}
+                                   maxLength={60}
+                                   onChange={e => onChange('title', e.target.value)}
+                                   placeholder="Meta title..."
+                                   className="w-full px-4 py-2.5 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200"
+                              />
+                              <span className={`absolute right-3.5 bottom-[-18px] text-[9px] font-semibold ${seoData.title.length > 55 ? 'text-red-500' : 'text-gray-400'}`}>
+                                   {seoData.title.length}/60
+                              </span>
+                         </div>
 
-               {/* Meta Description */}
-               <div style={{ position: 'relative' }}>
-                    <input
-                         type="text"
-                         value={seoData.description}
-                         maxLength={200}
-                         onChange={e => onChange('description', e.target.value)}
-                         placeholder="Meta description..."
-                         style={{
-                              width: '100%',
-                              padding: '8px 10px',
-                              fontSize: 12,
-                              border: '1.5px solid #e5e7eb',
-                              borderRadius: 8,
-                              outline: 'none',
-                              color: '#374151',
-                              background: '#fff',
-                              boxSizing: 'border-box',
-                              transition: 'border-color 0.15s',
-                         }}
-                         onFocus={e => (e.target.style.borderColor = '#f97316')}
-                         onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
-                    />
-                    <span style={{
-                         position: 'absolute', right: 8, bottom: -16,
-                         fontSize: 10, color: seoData.description.length > 190 ? '#ef4444' : '#9ca3af'
-                    }}>
-                         {seoData.description.length}/200
-                    </span>
-               </div>
-
-               {/* Keywords */}
-               {/* <div style={{ position: 'relative' }}>
-                    <input
-                         type="text"
-                         value={seoData.keywords}
-                         onChange={e => onChange('keywords', e.target.value)}
-                         placeholder="keyword1, keyword2..."
-                         style={{
-                              width: '100%',
-                              padding: '8px 10px',
-                              fontSize: 12,
-                              border: '1.5px solid #e5e7eb',
-                              borderRadius: 8,
-                              outline: 'none',
-                              color: '#374151',
-                              background: '#fff',
-                              boxSizing: 'border-box',
-                              transition: 'border-color 0.15s',
-                         }}
-                         onFocus={e => (e.target.style.borderColor = '#f97316')}
-                         onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
-                    />
-               </div> */}
+                         {/* Meta Description */}
+                         <div className="relative">
+                              <input
+                                   type="text"
+                                   value={seoData.description}
+                                   maxLength={200}
+                                   onChange={e => onChange('description', e.target.value)}
+                                   placeholder="Meta description..."
+                                   className="w-full px-4 py-2.5 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200"
+                              />
+                              <span className={`absolute right-3.5 bottom-[-18px] text-[9px] font-semibold ${seoData.description.length > 190 ? 'text-red-500' : 'text-gray-400'}`}>
+                                   {seoData.description.length}/200
+                              </span>
+                         </div>
+                    </>
+               )}
 
                {/* Save Button */}
-               <button
-                    onClick={onSave}
-                    disabled={saving || !seoData.title || !seoData.description}
-                    style={{
-                         padding: '8px 14px',
-                         borderRadius: 8,
-                         border: 'none',
-                         fontSize: 12,
-                         fontWeight: 600,
-                         cursor: saving || !seoData.title || !seoData.description ? 'not-allowed' : 'pointer',
-                         background: saved
-                              ? '#22c55e'
-                              : saving || !seoData.title || !seoData.description
-                                   ? '#e5e7eb'
-                                   : '#f97316',
-                         color: saving || !seoData.title || !seoData.description ? '#9ca3af' : '#fff',
-                         transition: 'all 0.2s',
-                         whiteSpace: 'nowrap',
-                         minWidth: 64,
-                    }}
-               >
-                    {saving ? '...' : saved ? '✓ Saved' : 'Save'}
-               </button>
+               <div className="flex justify-end pt-3 lg:pt-0">
+                    <button
+                         onClick={onSave}
+                         disabled={loading || saving || !seoData?.title || !seoData?.description}
+                         className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 min-w-[80px] flex items-center justify-center cursor-pointer shadow-sm ${
+                              saved
+                                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100'
+                                   : loading || saving || !seoData?.title || !seoData?.description
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                                        : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-100'
+                         }`}
+                    >
+                         {saving ? (
+                              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                         ) : saved ? (
+                              '✓ Saved'
+                         ) : (
+                              'Save'
+                         )}
+                    </button>
+               </div>
           </div>
      );
 }
 
 export default function PageSEOManager() {
-     const [isOpen, setIsOpen] = useState(false);
-     const dropdownRef = useRef(null);
-
      // Per-page SEO state: { [pageId]: { title, description, keywords } }
      const [seoMap, setSeoMap] = useState(() =>
           Object.fromEntries(PAGES.map(p => [p.id, { title: '', description: '', keywords: '' }]))
@@ -161,28 +93,13 @@ export default function PageSEOManager() {
      const [loadingMap, setLoadingMap] = useState({});
      const [savingMap, setSavingMap] = useState({});
      const [savedMap, setSavedMap] = useState({});
-     const [fetchedSet, setFetchedSet] = useState(new Set());
 
-     // Close dropdown on outside click
+     // Fetch SEO data for all pages immediately on mount
      useEffect(() => {
-          const handler = (e) => {
-               if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                    setIsOpen(false);
-               }
-          };
-          document.addEventListener('mousedown', handler);
-          return () => document.removeEventListener('mousedown', handler);
-     }, []);
-
-     // Fetch SEO data for all pages when dropdown opens
-     useEffect(() => {
-          if (!isOpen) return;
           PAGES.forEach(page => {
-               if (!fetchedSet.has(page.id)) {
-                    fetchPageSEO(page.id);
-               }
+               fetchPageSEO(page.id);
           });
-     }, [isOpen]);
+     }, []);
 
      const fetchPageSEO = async (pageId) => {
           setLoadingMap(prev => ({ ...prev, [pageId]: true }));
@@ -197,9 +114,8 @@ export default function PageSEOManager() {
                          keywords: data.keywords || '',
                     },
                }));
-               setFetchedSet(prev => new Set([...prev, pageId]));
-          } catch {
-               // keep empty defaults
+          } catch (err) {
+               console.error("Failed to fetch page SEO:", err);
           } finally {
                setLoadingMap(prev => ({ ...prev, [pageId]: false }));
           }
@@ -210,7 +126,6 @@ export default function PageSEOManager() {
                ...prev,
                [pageId]: { ...prev[pageId], [field]: value },
           }));
-          // Clear saved state on edit
           setSavedMap(prev => ({ ...prev, [pageId]: false }));
      };
 
@@ -226,164 +141,64 @@ export default function PageSEOManager() {
                if (!res.ok) throw new Error('Save failed');
                setSavedMap(prev => ({ ...prev, [pageId]: true }));
                setTimeout(() => setSavedMap(prev => ({ ...prev, [pageId]: false })), 2500);
-          } catch {
-               // handle error
+          } catch (err) {
+               console.error(err);
           } finally {
                setSavingMap(prev => ({ ...prev, [pageId]: false }));
           }
      };
 
      return (
-          <div>
+          <div className="min-h-screen bg-gray-50/50 pb-12 font-sans">
                <Breadcrumb />
-               <div style={{ padding: '24px 32px', maxWidth: 1200, margin: '0 auto', fontFamily: "'DM Sans', sans-serif" }}>
+               <div className="max-w-6xl mx-auto px-6 lg:px-8">
                     {/* Page Header */}
-                    <div style={{ marginBottom: 28 }}>
-                         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 }}>SEO Settings</h1>
-                         <p style={{ color: '#6b7280', fontSize: 14, marginTop: 4 }}>
-                              Manage meta titles, descriptions, and keywords for each page
+                    <div className="mb-8">
+                         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">SEO Settings</h1>
+                         <p className="text-sm text-gray-500 mt-1">
+                              Manage meta titles and descriptions for search engine optimization across all website pages.
                          </p>
                     </div>
 
-                    {/* Custom Dropdown */}
-                    <div ref={dropdownRef} style={{ position: 'relative', width: '100%' }}>
-                         {/* Trigger Button */}
-                         <button
-                              onClick={() => setIsOpen(prev => !prev)}
-                              style={{
-                                   width: '100%',
-                                   padding: '13px 18px',
-                                   background: '#fff',
-                                   border: '1.5px solid #e5e7eb',
-                                   borderRadius: isOpen ? '12px 12px 0 0' : 12,
-                                   cursor: 'pointer',
-                                   display: 'flex',
-                                   justifyContent: 'space-between',
-                                   alignItems: 'center',
-                                   fontSize: 14,
-                                   fontWeight: 600,
-                                   color: '#374151',
-                                   transition: 'border-color 0.15s, box-shadow 0.15s',
-                                   boxShadow: isOpen ? '0 0 0 3px rgba(249,115,22,0.1)' : '0 1px 3px rgba(0,0,0,0.06)',
-                                   borderColor: isOpen ? '#f97316' : '#e5e7eb',
-                              }}
-                         >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                   <span style={{
-                                        background: '#fff7ed', color: '#f97316',
-                                        padding: '2px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700,
-                                   }}>
-                                        SEO
+                    {/* Direct Row Layout Container */}
+                    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                         {/* Column Headers */}
+                         <div className="hidden lg:grid grid-cols-[180px_1fr_1fr_auto] gap-6 px-5 py-3.5 bg-gray-50 border-b border-gray-200">
+                              {['Page Name', 'Meta Title', 'Meta Description', 'Action'].map((label, i) => (
+                                   <span
+                                        key={i}
+                                        className={`text-[10px] font-bold text-gray-400 uppercase tracking-wider ${
+                                             i === 3 ? 'text-right pr-12' : ''
+                                        }`}
+                                   >
+                                        {label}
                                    </span>
-                                   <span>SEO Pages</span>
-                                   <span style={{
-                                        background: '#f3f4f6', color: '#6b7280',
-                                        padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                                   }}>
-                                        {PAGES.length} pages
-                                   </span>
-                              </div>
-                              <svg
-                                   style={{
-                                        width: 18, height: 18, color: '#9ca3af',
-                                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                                        transition: 'transform 0.2s',
-                                   }}
-                                   fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                              >
-                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                         </button>
+                              ))}
+                         </div>
 
-                         {/* Dropdown Panel */}
-                         {isOpen && (
-                              <div style={{
-                                   position: 'absolute',
-                                   top: '100%',
-                                   left: 0,
-                                   right: 0,
-                                   background: '#fff',
-                                   border: '1.5px solid #f97316',
-                                   borderTop: 'none',
-                                   borderRadius: '0 0 12px 12px',
-                                   boxShadow: '0 16px 40px rgba(0,0,0,0.10)',
-                                   zIndex: 100,
-                                   overflow: 'hidden',
-                              }}>
-                                   {/* Column Headers */}
-                                   <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: '160px 1fr 1fr 1fr auto',
-                                        gap: '10px',
-                                        padding: '10px 16px',
-                                        background: '#f9fafb',
-                                        borderBottom: '1.5px solid #f0f0f0',
-                                   }}>
-                                        {['Page', 'Meta Title', 'Meta Description', 'Keywords', ''].map((label, i) => (
-                                             <span key={i} style={{
-                                                  fontSize: 11,
-                                                  fontWeight: 700,
-                                                  color: '#9ca3af',
-                                                  textTransform: 'uppercase',
-                                                  letterSpacing: '0.05em',
-                                                  minWidth: i === 4 ? 64 : 'auto',
-                                             }}>
-                                                  {label}
-                                             </span>
-                                        ))}
-                                   </div>
+                         {/* Page Rows */}
+                         <div className="divide-y divide-gray-100">
+                              {PAGES.map((page) => (
+                                   <PageRow
+                                        key={page.id}
+                                        page={page}
+                                        seoData={seoMap[page.id]}
+                                        onChange={(field, value) => handleChange(page.id, field, value)}
+                                        onSave={() => handleSave(page.id)}
+                                        saving={!!savingMap[page.id]}
+                                        saved={!!savedMap[page.id]}
+                                        loading={!!loadingMap[page.id]}
+                                   />
+                              ))}
+                         </div>
 
-                                   {/* Page Rows */}
-                                   <div style={{ maxHeight: 480, overflowY: 'auto' }}>
-                                        {PAGES.map((page, idx) => (
-                                             <PageRow
-                                                  key={page.id}
-                                                  page={page}
-                                                  seoData={seoMap[page.id]}
-                                                  onChange={(field, value) => handleChange(page.id, field, value)}
-                                                  onSave={() => handleSave(page.id)}
-                                                  saving={!!savingMap[page.id]}
-                                                  saved={!!savedMap[page.id]}
-                                             />
-                                        ))}
-                                   </div>
-
-                                   {/* Footer */}
-                                   <div style={{
-                                        padding: '10px 16px',
-                                        background: '#f9fafb',
-                                        borderTop: '1px solid #f0f0f0',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                   }}>
-                                        <span style={{ fontSize: 12, color: '#9ca3af' }}>
-                                             💡 Changes are saved per page individually
-                                        </span>
-                                        <button
-                                             onClick={() => setIsOpen(false)}
-                                             style={{
-                                                  fontSize: 12, color: '#6b7280',
-                                                  background: 'none', border: 'none',
-                                                  cursor: 'pointer', padding: '4px 10px',
-                                                  borderRadius: 6, fontWeight: 500,
-                                             }}
-                                        >
-                                             Close ✕
-                                        </button>
-                                   </div>
-                              </div>
-                         )}
+                         {/* Footer Tip */}
+                         <div className="px-5 py-3.5 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                              <span className="text-[11px] text-gray-400">
+                                   💡 Changes must be saved per page individually by clicking the Save button next to each row.
+                              </span>
+                         </div>
                     </div>
-
-                    <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; }
-        input::placeholder { color: #d1d5db; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f9fafb; }
-        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-      `}</style>
                </div>
           </div>
      );

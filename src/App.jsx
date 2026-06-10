@@ -11,10 +11,15 @@ import FooterManager from "./pages/FooterManager"
 import CompanyWorked from "./pages/CompanyWorked"
 import HomeData from "./pages/HomeData"
 import AboutData from "./pages/AboutData"
+import NavbarManager from "./pages/NavbarManager"
+
+import AdminLayout from "./components/AdminLayout"
 
 const protectedPage = (page) => (
   <ProtectedRoute>
-    {page}
+    <AdminLayout>
+      {page}
+    </AdminLayout>
   </ProtectedRoute>
 )
 
@@ -33,6 +38,7 @@ const App = () => {
         <Route path='/companies-worked' element={protectedPage(<CompanyWorked />)} />
         <Route path='/home-data' element={protectedPage(<HomeData />)} />
         <Route path='/about-data' element={protectedPage(<AboutData />)} />
+        <Route path='/navbar-settings' element={protectedPage(<NavbarManager />)} />
         
       </Routes>
     </div>

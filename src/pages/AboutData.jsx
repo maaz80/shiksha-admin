@@ -168,17 +168,17 @@ export default function AboutData() {
      }
 
      return (
-          <div className="bg-gray-50 min-h-screen pb-12">
+          <div className="bg-gray-50/50 min-h-screen pb-12 font-sans">
                <Breadcrumb />
-               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 px-10 pt-8 gap-4">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 px-6 lg:px-10 max-w-7xl mx-auto">
                     <div>
-                         <h1 className="text-3xl font-bold text-gray-800">About Page Manager</h1>
+                         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">About Page Content</h1>
                          <p className="text-sm text-gray-500 mt-1">Manage content on the About page</p>
                     </div>
                     <button
                          onClick={handleSaveAll}
                          disabled={saving}
-                         className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded-lg shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                         className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed shrink-0"
                     >
                          <HiOutlineSave className="text-lg" />
                          {saving ? "Saving Changes..." : "Save All Data"}
@@ -186,13 +186,13 @@ export default function AboutData() {
                </div>
 
                {/* Tab Navigation */}
-               <div className="flex flex-wrap gap-2 px-10 mb-8">
+               <div className="flex flex-wrap gap-2 px-6 lg:px-10 max-w-7xl mx-auto mb-8">
                     <button onClick={() => setActiveTab("hero")} className={tabBtnClass("hero")}>Hero Section</button>
                     <button onClick={() => setActiveTab("shikshadetails")} className={tabBtnClass("shikshadetails")}>Shiksha Details ({shikshaDetails.length})</button>
                     <button onClick={() => setActiveTab("ourvalues")} className={tabBtnClass("ourvalues")}>Our Values ({ourValues.length})</button>
                </div>
 
-               <div className="px-10">
+               <div className="px-6 lg:px-10 max-w-7xl mx-auto">
                     {activeTab === "hero" && (
                          <div className="bg-white rounded-xl p-6 border border-gray-150 shadow-sm space-y-4 max-w-4xl">
                               <h2 className="text-lg font-bold text-gray-800 border-b border-gray-100 pb-3">Hero Section</h2>

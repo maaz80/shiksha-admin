@@ -301,20 +301,20 @@ export default function Courses() {
      const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all duration-200";
 
      return (
-          <div className="min-h-screen ">
+          <div className="min-h-screen bg-gray-50/50 pb-12 font-sans">
                <Breadcrumb />
                {/* Header */}
-               <div className="flex items-center justify-between mb-10 px-10 pt-10">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 px-6 lg:px-10 max-w-7xl mx-auto">
                     <div>
-                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Course Manager</h1>
-                         <p className="text-sm text-gray-400 mt-1">{courses.length} course{courses.length !== 1 ? "s" : ""} available</p>
+                         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Course Manager</h1>
+                         <p className="text-sm text-gray-500 mt-1">{courses.length} course{courses.length !== 1 ? "s" : ""} available</p>
                     </div>
 
                     <button
                          onClick={openUpload}
-                         className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5"
+                         className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
                     >
-                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                         <svg xmlns="http://www.w3.org/2500/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                          </svg>
                          Add Course
@@ -323,15 +323,15 @@ export default function Courses() {
 
                {/* Course Grid */}
                {courses.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-32 text-gray-300 px-10">
+                    <div className="flex flex-col items-center justify-center py-32 text-gray-300 px-6 lg:px-10 max-w-7xl mx-auto">
                          <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                          </svg>
-                         <p className="text-lg font-medium">No courses yet</p>
-                         <p className="text-sm mt-1">Click "Add Course" to get started</p>
+                         <p className="text-lg font-medium text-gray-700">No courses yet</p>
+                         <p className="text-sm mt-1 text-gray-400">Click "Add Course" to get started</p>
                     </div>
                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 px-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 px-6 lg:px-10 max-w-7xl mx-auto">
                          {courses.map(course => (
                               <div key={course._id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group">
 

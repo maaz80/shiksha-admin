@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { clearAdminToken, isAdminLoggedIn, setAdminToken } from "../utils/auth.js";
+import { HiOutlineLockClosed, HiOutlineUser, HiOutlineLockOpen } from "react-icons/hi";
 
 const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api";
 
@@ -46,44 +47,100 @@ export default function Login() {
      };
 
      return (
-          <div className="min-h-screen bg-neutral-950/20 backdrop-blur-2xl flex items-center justify-center px-4">
-               <form
-                    onSubmit={handleSubmit}
-                    className="w-full max-w-sm bg-white p-8 rounded-xl shadow-xl"
-               >
-                    <h1 className="text-2xl font-semibold mb-6">Admin Login</h1>
+          <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
+               {/* Background Decorative Blobs */}
+               <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl" />
+               <div className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 w-96 h-96 rounded-full bg-orange-100/30 blur-3xl" />
 
-                    <label className="block text-sm font-medium mb-2">Username</label>
-                    <input
-                         value={username}
-                         onChange={(event) => setUsername(event.target.value)}
-                         className="border border-gray-300 rounded-lg p-3 mb-4 w-full outline-none focus:ring-2 focus:ring-orange-400"
-                         autoComplete="username"
-                         required
-                    />
+               <div className="w-full max-w-md z-10 space-y-8">
+                    {/* Brand / Logo */}
+                    <div className="flex flex-col items-center justify-center text-center space-y-3">
+                         <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-orange-500/20">
+                              S
+                         </div>
+                         <div>
+                              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                                   Shiksha Admin
+                              </h1>
+                              <p className="text-gray-400 text-sm mt-1">
+                                   Enter credentials to manage your platform
+                              </p>
+                         </div>
+                    </div>
 
-                    <label className="block text-sm font-medium mb-2">Password</label>
-                    <input
-                         type="password"
-                         value={password}
-                         onChange={(event) => setPassword(event.target.value)}
-                         className="border border-gray-300 rounded-lg p-3 mb-4 w-full outline-none focus:ring-2 focus:ring-orange-400"
-                         autoComplete="current-password"
-                         required
-                    />
+                    {/* Card Container */}
+                    <div className="bg-white border border-gray-200/80 p-8 rounded-3xl shadow-xl shadow-gray-200/40 space-y-6">
+                         <form onSubmit={handleSubmit} className="space-y-5">
+                              {/* Username Input */}
+                              <div className="space-y-1.5">
+                                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        Username
+                                   </label>
+                                   <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                             <HiOutlineUser className="w-5 h-5" />
+                                        </div>
+                                        <input
+                                             type="text"
+                                             value={username}
+                                             onChange={(event) => setUsername(event.target.value)}
+                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200"
+                                             placeholder="admin"
+                                             autoComplete="username"
+                                             required
+                                        />
+                                   </div>
+                              </div>
 
-                    {error && (
-                         <p className="text-sm text-red-600 mb-4">{error}</p>
-                    )}
+                              {/* Password Input */}
+                              <div className="space-y-1.5">
+                                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        Password
+                                   </label>
+                                   <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                             <HiOutlineLockClosed className="w-5 h-5" />
+                                        </div>
+                                        <input
+                                             type="password"
+                                             value={password}
+                                             onChange={(event) => setPassword(event.target.value)}
+                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200"
+                                             placeholder="••••••••"
+                                             autoComplete="current-password"
+                                             required
+                                        />
+                                   </div>
+                              </div>
 
-                    <button
-                         type="submit"
-                         disabled={loading}
-                         className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium disabled:opacity-60"
-                    >
-                         {loading ? "Logging in..." : "Login"}
-                    </button>
-               </form>
+                              {/* Error alert */}
+                              {error && (
+                                   <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-xs font-medium flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                                        <span>{error}</span>
+                                   </div>
+                              )}
+
+                              {/* Submit button */}
+                              <button
+                                   type="submit"
+                                   disabled={loading}
+                                   className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white py-3 rounded-xl font-semibold shadow-lg shadow-orange-500/10 hover:-translate-y-0.5 disabled:translate-y-0 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed text-sm"
+                              >
+                                   {loading ? (
+                                        <>
+                                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                             <span>Logging in...</span>
+                                        </>
+                                   ) : (
+                                        <>
+                                             <span>Sign In</span>
+                                        </>
+                                   )}
+                              </button>
+                         </form>
+                    </div>
+               </div>
           </div>
      );
 }

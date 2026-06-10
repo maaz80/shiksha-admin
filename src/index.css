@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Poppins", sans-serif;
+}
+
+/* Force Poppins on all elements, including inputs and form elements */
+*, *::before, *::after {
+  font-family: "Poppins", "Open Sans", sans-serif;
+}
+
 .poppins-regular {
   font-family: "Poppins", sans-serif;
 }
@@ -7,6 +16,7 @@
 .open-sans {
   font-family: "Open Sans", sans-serif;
 }
+
 .container {
   overflow: auto;
   -ms-overflow-style: none;

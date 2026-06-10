@@ -129,19 +129,19 @@ export default function FooterManager() {
      const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent focus:bg-white transition-all duration-200";
 
      return (
-          <div className="min-h-screen">
+          <div className="min-h-screen bg-gray-50/50 pb-12 font-sans">
                <Breadcrumb />
 
                {/* Header */}
-               <div className="flex items-center justify-between mb-10 px-10 pt-10">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 px-6 lg:px-10 max-w-7xl mx-auto">
                     <div>
-                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Footer Links Manager</h1>
-                         <p className="text-sm text-gray-400 mt-1">Manage dynamic footer sections & column links</p>
+                         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Footer Links Manager</h1>
+                         <p className="text-sm text-gray-500 mt-1">Manage dynamic footer sections & column links</p>
                     </div>
 
                     <button
                          onClick={openAddModal}
-                         className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                         className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
                     >
                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -152,15 +152,15 @@ export default function FooterManager() {
 
                {/* Columns List */}
                {columns.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-32 text-gray-300 px-10">
+                    <div className="flex flex-col items-center justify-center py-32 text-gray-300 px-6 lg:px-10 max-w-7xl mx-auto">
                          <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                          </svg>
-                         <p className="text-lg font-medium">No footer columns configured yet</p>
-                         <p className="text-sm mt-1">Click "Add Column" to build your dynamic footer</p>
+                         <p className="text-lg font-medium text-gray-700">No footer columns configured yet</p>
+                         <p className="text-sm mt-1 text-gray-400">Click "Add Column" to build your dynamic footer</p>
                     </div>
                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-6 lg:px-10 max-w-7xl mx-auto">
                          {columns.map(col => (
                               <div key={col._id} className="bg-white rounded-2xl p-5 border border-gray-150 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between">
                                    <div>
