@@ -23,12 +23,14 @@ const navigationItems = [
      { name: "Blogs", path: "/blogs", icon: HiOutlineBookOpen },
      { name: "Locations", path: "/location", icon: HiOutlineLocationMarker },
      { name: "FAQ Manager", path: "/faq", icon: HiOutlineQuestionMarkCircle },
-     { name: "Partners", path: "/companies-worked", icon: HiOutlineBriefcase },
+     { name: "Companies Worked", path: "/companies-worked", icon: HiOutlineBriefcase },
      { name: "Home Content", path: "/home-data", icon: HiOutlineDatabase },
      { name: "About Content", path: "/about-data", icon: HiOutlineDatabase },
      { name: "SEO Settings", path: "/site-meta", icon: HiOutlineGlobeAlt },
      { name: "Footer Links", path: "/footer", icon: HiOutlineLink },
      { name: "Navbar Settings", path: "/navbar-settings", icon: HiOutlineMenu },
+     { name: "Legal Settings", path: "/policy-settings", icon: HiOutlineLink },
+     { name: "Contact Settings", path: "/contact-settings", icon: HiOutlineLink },
 ];
 
 export default function AdminLayout({ children }) {
@@ -55,9 +57,8 @@ export default function AdminLayout({ children }) {
 
                {/* Sidebar Component */}
                <aside
-                    className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200/80 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:z-auto ${
-                         sidebarOpen ? "translate-x-0" : "-translate-x-full"
-                    }`}
+                    className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200/80 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:z-auto ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                         }`}
                >
                     {/* Upper Sidebar */}
                     <div className="flex flex-col overflow-y-auto flex-1">
@@ -93,11 +94,10 @@ export default function AdminLayout({ children }) {
                                              key={item.name}
                                              to={item.path}
                                              onClick={() => setSidebarOpen(false)}
-                                             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-                                                  isActive
+                                             className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${isActive
                                                        ? "bg-orange-50 text-orange-600 shadow-sm shadow-orange-50/50"
                                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                             }`}
+                                                  }`}
                                         >
                                              <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-orange-500" : "text-gray-400 group-hover:text-gray-600"}`} />
                                              <span>{item.name}</span>
@@ -117,7 +117,7 @@ export default function AdminLayout({ children }) {
                                    <div className="min-w-0">
                                         <p className="text-sm font-semibold text-gray-800 truncate font-sans">Administrator</p>
                                         <p className="text-xs text-gray-400 truncate font-sans">admin@shiksha.com</p>
-                                    </div>
+                                   </div>
                               </div>
                          </div>
                          <button

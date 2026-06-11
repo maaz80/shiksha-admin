@@ -3,6 +3,7 @@ import Editor from "../components/Editor";
 import ImageUploader from "../components/ImageUploader";
 import Breadcrumb from "../components/BreadCrumb";
 import { HiOutlinePlus, HiOutlineTrash, HiOutlineBookOpen, HiOutlineCalendar, HiOutlineUser } from "react-icons/hi";
+import { getAdminToken } from "../utils/auth";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api';
 
@@ -24,15 +25,63 @@ export default function Blogs() {
      const [slug, setSlug] = useState("");
      const [description, setDescription] = useState("");
 
+     // Blog Page Titles States
+     const [blogstitle, setBlogstitle] = useState("Our Blogs");
+     const [featuredblogstitle, setFeaturedblogstitle] = useState("Featured Blogs");
+     const [savingTitles, setSavingTitles] = useState(false);
+
      const fetchBlogs = async () => {
           const res = await fetch(`${API_URL}/blogs`);
           const data = await res.json();
           setBlogs(data);
      };
 
+     const fetchBlogPageData = async () => {
+          try {
+               const res = await fetch(`${API_URL}/blogpage-data`);
+               if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                         setBlogstitle(data.blogstitle || "Our Blogs");
+                         setFeaturedblogstitle(data.featuredblogstitle || "Featured Blogs");
+                    }
+               }
+          } catch (err) {
+               console.error("Error fetching blog page titles:", err);
+          }
+     };
+
      useEffect(() => {
           fetchBlogs();
+          fetchBlogPageData();
      }, []);
+
+     const saveBlogPageTitles = async () => {
+          try {
+               setSavingTitles(true);
+               const res = await fetch(`${API_URL}/blogpage-data`, {
+                    method: "PUT",
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": `Bearer ${getAdminToken()}`
+                    },
+                    body: JSON.stringify({
+                         blogstitle,
+                         featuredblogstitle
+                    })
+               });
+               if (res.ok) {
+                    alert("Blog Page Titles saved successfully!");
+               } else {
+                    alert("Failed to save blog page titles.");
+               }
+          } catch (err) {
+               console.error("Error saving blog page titles:", err);
+               alert("Server error occurred.");
+          } finally {
+               setSavingTitles(false);
+          }
+     };
 
      const openUpload = () => {
           setEditItem(null);
@@ -136,6 +185,40 @@ export default function Blogs() {
                               <HiOutlinePlus className="w-4 h-4 text-white" />
                               <span>Upload Blog</span>
                          </button>
+                    </div>
+
+                    {/* Blog Page Titles Settings Card */}
+                    <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm mb-8">
+                         <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 mb-4">Blog Page Configuration</h2>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                              <div className="space-y-1.5">
+                                   <label className={labelClass}>Blogs Main Title</label>
+                                   <input
+                                        value={blogstitle}
+                                        onChange={(e) => setBlogstitle(e.target.value)}
+                                        placeholder="e.g. Our Blogs"
+                                        className={inputClass}
+                                   />
+                              </div>
+                              <div className="space-y-1.5">
+                                   <label className={labelClass}>Featured Blogs Title</label>
+                                   <input
+                                        value={featuredblogstitle}
+                                        onChange={(e) => setFeaturedblogstitle(e.target.value)}
+                                        placeholder="e.g. Featured Blogs"
+                                        className={inputClass}
+                                   />
+                              </div>
+                         </div>
+                         <div className="mt-4 flex justify-end">
+                              <button
+                                   onClick={saveBlogPageTitles}
+                                   disabled={savingTitles}
+                                   className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                              >
+                                   {savingTitles ? "Saving..." : "Save Titles"}
+                              </button>
+                         </div>
                     </div>
 
                     {/* Blog Card Grid */}

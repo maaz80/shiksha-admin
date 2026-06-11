@@ -17,6 +17,7 @@ const PAGES = [
 ];
 
 const defaultFaq = {
+     title: 'FAQ',
      faq: [],
 };
 
@@ -145,6 +146,7 @@ export default function FaqManager() {
                const response = await fetch(`${API_URL}/pages/${slug}/faq`);
                const data = await response.json();
                setFormData({
+                    title: data?.title || 'FAQ',
                     faq: data?.faq || [],
                });
           } catch (error) {
@@ -301,6 +303,21 @@ export default function FaqManager() {
                          </div>
                     ) : (
                          <div className="space-y-6">
+                              {/* FAQ Section Title settings card */}
+                              <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
+                                   <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">FAQ Header Configuration</h2>
+                                   <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">FAQ Section Title</label>
+                                        <input
+                                             type="text"
+                                             value={formData.title || ""}
+                                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                                             placeholder="e.g. FAQ"
+                                             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 font-sans"
+                                        />
+                                   </div>
+                              </div>
+
                               {/* FAQ list card */}
                               <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-6">
                                    <div className="flex items-center justify-between gap-4">

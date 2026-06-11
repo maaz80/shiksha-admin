@@ -557,11 +557,11 @@ export default function Locations() {
                                                   {pageForm.location.cards.map((card, index) => (
                                                        <Card key={index}>
                                                             {card.image || card.file ? (
-                                                                 <div className="aspect-[16/10] w-full rounded-lg overflow-hidden bg-gray-50 border border-gray-100 p-1 mb-3">
+                                                                 <div className="aspect-16/10 w-full rounded-lg overflow-hidden bg-gray-50 border border-gray-100 p-1 mb-3">
                                                                       <img src={card.file instanceof File ? URL.createObjectURL(card.file) : card.image} className="w-full h-full object-cover rounded" alt="Location" />
                                                                  </div>
                                                             ) : (
-                                                                 <div className="aspect-[16/10] w-full bg-gray-50 rounded-lg mb-3 flex items-center justify-center border border-dashed border-gray-200">
+                                                                 <div className="aspect-16/10 w-full bg-gray-50 rounded-lg mb-3 flex items-center justify-center border border-dashed border-gray-200">
                                                                       <span className="text-gray-400 text-xs">No Image Selected</span>
                                                                  </div>
                                                             )}

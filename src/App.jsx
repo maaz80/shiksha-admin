@@ -11,6 +11,8 @@ import FooterManager from "./pages/FooterManager"
 import CompanyWorked from "./pages/CompanyWorked"
 import HomeData from "./pages/HomeData"
 import AboutData from "./pages/AboutData"
+import PolicyData from "./pages/PolicyData"
+import ContactData from "./pages/ContactData"
 import NavbarManager from "./pages/NavbarManager"
 
 import AdminLayout from "./components/AdminLayout"
@@ -38,6 +40,8 @@ const App = () => {
         <Route path='/companies-worked' element={protectedPage(<CompanyWorked />)} />
         <Route path='/home-data' element={protectedPage(<HomeData />)} />
         <Route path='/about-data' element={protectedPage(<AboutData />)} />
+        <Route path='/policy-settings' element={protectedPage(<PolicyData />)} />
+        <Route path='/contact-settings' element={protectedPage(<ContactData />)} />
         <Route path='/navbar-settings' element={protectedPage(<NavbarManager />)} />
         
       </Routes>

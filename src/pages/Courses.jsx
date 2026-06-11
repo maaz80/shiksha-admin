@@ -37,15 +37,60 @@ export default function Courses() {
      const [image, setImage] = useState(null);
      const [sections, setSections] = useState([]);
 
+     // Course Page Title States
+     const [coursestitle, setCoursestitle] = useState("All Courses");
+     const [savingPageTitle, setSavingPageTitle] = useState(false);
+
      const fetchCourses = async () => {
           const res = await fetch(`${API_URL}/courses`);
           const data = await res.json();
           setCourses(data);
      };
 
+     const fetchCoursePageData = async () => {
+          try {
+               const res = await fetch(`${API_URL}/coursepage-data`);
+               if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                         setCoursestitle(data.coursestitle || "All Courses");
+                    }
+               }
+          } catch (err) {
+               console.error("Error fetching course page title:", err);
+          }
+     };
+
      useEffect(() => {
           fetchCourses();
+          fetchCoursePageData();
      }, []);
+
+     const saveCoursePageTitle = async () => {
+          try {
+               setSavingPageTitle(true);
+               const res = await fetch(`${API_URL}/coursepage-data`, {
+                    method: "PUT",
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": `Bearer ${getAdminToken()}`
+                    },
+                    body: JSON.stringify({
+                         coursestitle
+                    })
+               });
+               if (res.ok) {
+                    alert("Course Page Title saved successfully!");
+               } else {
+                    alert("Failed to save course page title.");
+               }
+          } catch (err) {
+               console.error("Error saving course page title:", err);
+               alert("Server error occurred.");
+          } finally {
+               setSavingPageTitle(false);
+          }
+     };
 
      const resetForm = () => {
           setTitle("");
@@ -314,11 +359,34 @@ export default function Courses() {
                          onClick={openUpload}
                          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
                     >
-                         <svg xmlns="http://www.w3.org/2500/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                          </svg>
                          Add Course
                     </button>
+               </div>
+
+               {/* Course Page Title Settings Card */}
+               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8 px-6 lg:px-10 max-w-7xl mx-auto">
+                    <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 mb-4">Course Page Configuration</h2>
+                    <div className="space-y-1.5 max-w-md">
+                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Courses Page Title</label>
+                         <input
+                              value={coursestitle}
+                              onChange={(e) => setCoursestitle(e.target.value)}
+                              placeholder="e.g. All Courses"
+                              className={inputClass}
+                         />
+                    </div>
+                    <div className="mt-4 flex justify-start">
+                         <button
+                              onClick={saveCoursePageTitle}
+                              disabled={savingPageTitle}
+                              className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                         >
+                              {savingPageTitle ? "Saving..." : "Save Title"}
+                         </button>
+                    </div>
                </div>
 
                {/* Course Grid */}

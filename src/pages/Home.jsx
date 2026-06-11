@@ -40,7 +40,7 @@ export default function Home() {
                          courses: Array.isArray(resCourses) ? resCourses.length : 0,
                          blogs: Array.isArray(resBlogs) ? resBlogs.length : 0,
                          locations: Array.isArray(resLocations) ? resLocations.length : 0,
-                         partners: Array.isArray(resPartners) ? resPartners.length : 0
+                         partners: resPartners && Array.isArray(resPartners.images) ? resPartners.images.length : 0
                     });
                } catch (err) {
                     console.error("Failed to load statistics:", err);
