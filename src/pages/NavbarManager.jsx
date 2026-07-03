@@ -15,8 +15,8 @@ export default function NavbarManager() {
      const [logoFile, setLogoFile] = useState(null);
      const [buttonName, setButtonName] = useState("All Courses");
      const [searchPlaceholder, setSearchPlaceholder] = useState("Search your course");
-     const [dropdownName, setDropdownName] = useState("More");
-     const [dropdownItems, setDropdownItems] = useState([]);
+     const [moreTitle, setMoreTitle] = useState("More");
+     const [moreDropdownItems, setMoreDropdownItems] = useState([]);
      const [logoutButtonName, setLogoutButtonName] = useState("Logout");
 
      const displayToast = (message) => {
@@ -33,9 +33,20 @@ export default function NavbarManager() {
                     setLogo(data.logo || "");
                     setButtonName(data.buttonName || "All Courses");
                     setSearchPlaceholder(data.searchPlaceholder || "Search your course");
-                    setDropdownName(data.dropdownName || "More");
-                    setDropdownItems(data.dropdownItems || []);
                     setLogoutButtonName(data.logoutButtonName || "Logout");
+                    
+                    if (data.moreItems) {
+                         setMoreTitle(data.moreItems.title || "More");
+                         setMoreDropdownItems(data.moreItems.dropdown_items || []);
+                    } else {
+                         setMoreTitle(data.dropdownName || "More");
+                         setMoreDropdownItems([
+                              {
+                                   title: data.dropdownName || "Links",
+                                   items: data.dropdownItems || []
+                               }
+                         ]);
+                    }
                }
           } catch (err) {
                console.error("Error fetching navbar data:", err);
@@ -48,18 +59,38 @@ export default function NavbarManager() {
           fetchNavbarData();
      }, []);
 
-     const handleAddDropdownItem = () => {
-          setDropdownItems([...dropdownItems, { name: "", link: "" }]);
+     const handleAddCategory = () => {
+          setMoreDropdownItems([...moreDropdownItems, { title: "", items: [] }]);
      };
 
-     const handleUpdateDropdownItem = (index, field, value) => {
-          const updated = [...dropdownItems];
-          updated[index] = { ...updated[index], [field]: value };
-          setDropdownItems(updated);
+     const handleUpdateCategoryTitle = (catIdx, value) => {
+          const updated = [...moreDropdownItems];
+          updated[catIdx] = { ...updated[catIdx], title: value };
+          setMoreDropdownItems(updated);
      };
 
-     const handleDeleteDropdownItem = (index) => {
-          setDropdownItems(dropdownItems.filter((_, i) => i !== index));
+     const handleDeleteCategory = (catIdx) => {
+          setMoreDropdownItems(moreDropdownItems.filter((_, i) => i !== catIdx));
+     };
+
+     const handleAddLinkItem = (catIdx) => {
+          const updated = [...moreDropdownItems];
+          updated[catIdx].items = [...(updated[catIdx].items || []), { name: "", link: "" }];
+          setMoreDropdownItems(updated);
+     };
+
+     const handleUpdateLinkItem = (catIdx, itemIdx, field, value) => {
+          const updated = [...moreDropdownItems];
+          const updatedItems = [...updated[catIdx].items];
+          updatedItems[itemIdx] = { ...updatedItems[itemIdx], [field]: value };
+          updated[catIdx] = { ...updated[catIdx], items: updatedItems };
+          setMoreDropdownItems(updated);
+     };
+
+     const handleDeleteLinkItem = (catIdx, itemIdx) => {
+          const updated = [...moreDropdownItems];
+          updated[catIdx].items = updated[catIdx].items.filter((_, i) => i !== itemIdx);
+          setMoreDropdownItems(updated);
      };
 
      const handleSave = async (e) => {
@@ -75,9 +106,22 @@ export default function NavbarManager() {
                }
                formData.append("buttonName", buttonName);
                formData.append("searchPlaceholder", searchPlaceholder);
-               formData.append("dropdownName", dropdownName);
-               formData.append("dropdownItems", JSON.stringify(dropdownItems.filter(item => item.name && item.link)));
+               formData.append("dropdownName", moreTitle);
+               
+               // Flatten for legacy backward compatibility
+               const legacyDropdownItems = moreDropdownItems.flatMap(cat => cat.items || []).filter(item => item.name && item.link);
+               formData.append("dropdownItems", JSON.stringify(legacyDropdownItems));
+               
                formData.append("logoutButtonName", logoutButtonName);
+
+               // New multi-column JSON string
+               formData.append("moreItems", JSON.stringify({
+                    title: moreTitle,
+                    dropdown_items: moreDropdownItems.map(cat => ({
+                         title: cat.title,
+                         items: (cat.items || []).filter(item => item.name && item.link)
+                    })).filter(cat => cat.title)
+               }));
 
                const res = await fetch(`${API_URL}/navbar-data`, {
                     method: "PUT",
@@ -231,12 +275,12 @@ export default function NavbarManager() {
                               <div className="lg:col-span-1">
                                    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
                                         <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                                             <h2 className="text-base font-bold text-gray-900">Dropdown Menu</h2>
+                                             <h2 className="text-base font-bold text-gray-900">More Dropdown Menu</h2>
                                              <button
-                                                  onClick={handleAddDropdownItem}
+                                                  onClick={handleAddCategory}
                                                   className="text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-xl border border-orange-100 transition-colors cursor-pointer"
                                              >
-                                                  + Add Link
+                                                  + Add Column
                                              </button>
                                         </div>
 
@@ -244,57 +288,86 @@ export default function NavbarManager() {
                                              <label className={labelClass}>Dropdown Menu Title</label>
                                              <input
                                                   type="text"
-                                                  value={dropdownName}
-                                                  onChange={(e) => setDropdownName(e.target.value)}
+                                                  value={moreTitle}
+                                                  onChange={(e) => setMoreTitle(e.target.value)}
                                                   className={inputClass}
                                                   placeholder="e.g. More"
                                                   required
                                              />
                                         </div>
 
-                                        <div className="space-y-3 pt-3 border-t border-gray-100">
-                                             <label className={labelClass}>Dropdown Links</label>
-                                             {dropdownItems.length === 0 ? (
+                                        <div className="space-y-4 pt-3 border-t border-gray-100">
+                                             <label className={labelClass}>Dropdown Columns</label>
+                                             {moreDropdownItems.length === 0 ? (
                                                   <div className="py-8 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center px-4 bg-gray-50/40">
                                                        <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 text-sm mb-3">
                                                             <HiOutlineMenu className="w-5 h-5" />
                                                        </div>
-                                                       <h3 className="text-gray-900 font-bold text-xs">No links added</h3>
+                                                       <h3 className="text-gray-900 font-bold text-xs">No columns added</h3>
                                                        <p className="text-[10px] text-gray-400 mt-1 max-w-[150px] leading-normal">
-                                                            Add navigation items to the header dropdown menu.
+                                                            Add columns to create a multi-column dropdown list.
                                                        </p>
                                                   </div>
                                              ) : (
-                                                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
-                                                       {dropdownItems.map((item, index) => (
-                                                            <div key={index} className="bg-gray-50/50 p-3.5 rounded-xl border border-gray-200 relative space-y-2.5 pt-8">
+                                                  <div className="space-y-5 max-h-[500px] overflow-y-auto pr-1">
+                                                       {moreDropdownItems.map((cat, catIdx) => (
+                                                            <div key={catIdx} className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 relative space-y-3">
+                                                                 <button
+                                                                      onClick={() => handleDeleteCategory(catIdx)}
+                                                                      className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-lg transition-all cursor-pointer"
+                                                                      title="Remove Column"
+                                                                 >
+                                                                      <HiOutlineTrash className="w-4 h-4" />
+                                                                 </button>
+
                                                                  <div className="space-y-1">
-                                                                      <label className="block text-[9px] font-bold text-gray-400 uppercase tracking-wider">Link Name</label>
+                                                                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Column Title</label>
                                                                       <input
-                                                                           value={item.name}
-                                                                           onChange={(e) => handleUpdateDropdownItem(index, 'name', e.target.value)}
+                                                                           value={cat.title}
+                                                                           onChange={(e) => handleUpdateCategoryTitle(catIdx, e.target.value)}
                                                                            placeholder="e.g. Resources"
                                                                            className={inputClass}
                                                                            required
                                                                       />
                                                                  </div>
-                                                                 <div className="space-y-1">
-                                                                      <label className="block text-[9px] font-bold text-gray-400 uppercase tracking-wider">Redirect Path</label>
-                                                                      <input
-                                                                           value={item.link}
-                                                                           onChange={(e) => handleUpdateDropdownItem(index, 'link', e.target.value)}
-                                                                           placeholder="e.g. /resources or #"
-                                                                           className={inputClass}
-                                                                           required
-                                                                      />
+
+                                                                 <div className="space-y-2 pt-2 border-t border-gray-200/50">
+                                                                      <div className="flex justify-between items-center">
+                                                                           <label className="block text-[9px] font-bold text-gray-400 uppercase tracking-wider font-sans">Links</label>
+                                                                           <button
+                                                                                onClick={() => handleAddLinkItem(catIdx)}
+                                                                                className="text-[10px] font-bold text-orange-500 hover:text-orange-600 cursor-pointer"
+                                                                           >
+                                                                                + Add Link
+                                                                           </button>
+                                                                      </div>
+
+                                                                      {(cat.items || []).map((item, itemIdx) => (
+                                                                           <div key={itemIdx} className="flex gap-2 items-center bg-white p-2 rounded-lg border border-gray-100 relative pr-8">
+                                                                                <input
+                                                                                     value={item.name}
+                                                                                     onChange={(e) => handleUpdateLinkItem(catIdx, itemIdx, 'name', e.target.value)}
+                                                                                     placeholder="Name"
+                                                                                     className="w-1/2 px-2 py-1 rounded bg-gray-50 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:bg-white font-sans"
+                                                                                     required
+                                                                                />
+                                                                                <input
+                                                                                     value={item.link}
+                                                                                     onChange={(e) => handleUpdateLinkItem(catIdx, itemIdx, 'link', e.target.value)}
+                                                                                     placeholder="Path"
+                                                                                     className="w-1/2 px-2 py-1 rounded bg-gray-50 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:bg-white font-sans"
+                                                                                     required
+                                                                                />
+                                                                                <button
+                                                                                     onClick={() => handleDeleteLinkItem(catIdx, itemIdx)}
+                                                                                     className="absolute right-1 text-gray-400 hover:text-red-500 p-1 cursor-pointer"
+                                                                                     title="Delete Link"
+                                                                                >
+                                                                                     <HiOutlineTrash className="w-3.5 h-3.5" />
+                                                                                </button>
+                                                                           </div>
+                                                                      ))}
                                                                  </div>
-                                                                 <button
-                                                                      onClick={() => handleDeleteDropdownItem(index)}
-                                                                      className="absolute top-1 right-1 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-lg transition-all cursor-pointer"
-                                                                      title="Remove item"
-                                                                 >
-                                                                      <HiOutlineTrash className="w-4 h-4" />
-                                                                 </button>
                                                             </div>
                                                        ))}
                                                   </div>

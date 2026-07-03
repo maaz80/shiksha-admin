@@ -5,6 +5,12 @@ import Breadcrumb from "../components/BreadCrumb.jsx";
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api";
 
 export default function Courses() {
+     const getInitials = (name) => {
+          if (!name) return "";
+          const parts = name.trim().split(/\s+/);
+          if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+          return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+     };
 
      const [courses, setCourses] = useState([]);
      const [showModal, setShowModal] = useState(false);
@@ -16,9 +22,7 @@ export default function Courses() {
      const [reviewRole, setReviewRole] = useState("");
      const [reviewRating, setReviewRating] = useState(5);
      const [reviewText, setReviewText] = useState("");
-     const [reviewerImage, setReviewerImage] = useState(null);
      const [reviewSubmitting, setReviewSubmitting] = useState(false);
-     const fileInputRef = useRef(null);
 
      const [title, setTitle] = useState("");
      const [category, setCategory] = useState("");
@@ -36,6 +40,13 @@ export default function Courses() {
 
      const [image, setImage] = useState(null);
      const [sections, setSections] = useState([]);
+     const [faq, setFaq] = useState([]);
+     const [toast, setToast] = useState({ show: false, message: "" });
+
+     const displayToast = (message) => {
+          setToast({ show: true, message });
+          setTimeout(() => setToast({ show: false, message: "" }), 3000);
+     };
 
      // Course Page Title States
      const [coursestitle, setCoursestitle] = useState("All Courses");
@@ -107,6 +118,7 @@ export default function Courses() {
           setSeoTitle("");
           setSeoDescription("");
           setSections([]);
+          setFaq([]);
           setImage(null);
      };
 
@@ -185,6 +197,7 @@ export default function Courses() {
           setFees(course.fees || "");
           setDeadline(course.deadline || "");
           setSections(course.sections || []);
+          setFaq(course.faq || []);
           setAlt(course.alt || "");
           setSeoTitle(course.seoTitle || "");
           setSeoDescription(course.seoDescription || "");
@@ -192,35 +205,57 @@ export default function Courses() {
      };
 
      const saveCourse = async () => {
-          const formData = new FormData();
-          formData.append("title", title);
-          formData.append("category", category);
-          formData.append("name", name);
-          formData.append("courseLength", courseLength);
-          formData.append("students", students);
-          formData.append("level", level);
-          formData.append("totalLessons", totalLessons);
-          formData.append("overview", overview);
-          formData.append("fees", fees);
-          formData.append("deadline", deadline);
-          formData.append("sections", JSON.stringify(sections));
-          formData.append("alt", alt);
-          formData.append("seoTitle", seoTitle);
-          formData.append("seoDescription", seoDescription);
-          if (image) formData.append("image", image);
+          try {
+               const formData = new FormData();
+               formData.append("title", title);
+               formData.append("category", category);
+               formData.append("name", name);
+               formData.append("courseLength", courseLength);
+               formData.append("students", students);
+               formData.append("level", level);
+               formData.append("totalLessons", totalLessons);
+               formData.append("overview", overview);
+               formData.append("fees", fees);
+               formData.append("deadline", deadline);
+               formData.append("sections", JSON.stringify(sections));
+               formData.append("faq", JSON.stringify(faq));
+               formData.append("alt", alt);
+               formData.append("seoTitle", seoTitle);
+               formData.append("seoDescription", seoDescription);
+               if (image) formData.append("image", image);
 
-          if (editItem) {
-               await fetch(`${API_URL}/courses/${editItem._id}`, { method: "PUT", body: formData });
-          } else {
-               await fetch(`${API_URL}/courses`, { method: "POST", body: formData });
+               if (editItem) {
+                    const res = await fetch(`${API_URL}/courses/${editItem._id}`, { method: "PUT", body: formData });
+                    if (res.ok) {
+                         displayToast("Course updated successfully!");
+                    } else {
+                         displayToast("Failed to update course.");
+                    }
+               } else {
+                    const res = await fetch(`${API_URL}/courses`, { method: "POST", body: formData });
+                    if (res.ok) {
+                         displayToast("Course created successfully!");
+                    } else {
+                         displayToast("Failed to create course.");
+                    }
+               }
+
+               setShowModal(false);
+               fetchCourses();
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
           }
-
-          setShowModal(false);
-          fetchCourses();
      };
 
      const deleteCourse = async (id) => {
-          await fetch(`${API_URL}/courses/${id}`, { method: "DELETE" });
+          if (!window.confirm("Are you sure you want to delete this course?")) return;
+          const res = await fetch(`${API_URL}/courses/${id}`, { method: "DELETE" });
+          if (res.ok) {
+               displayToast("Course deleted successfully!");
+          } else {
+               displayToast("Failed to delete course.");
+          }
           fetchCourses();
      };
 
@@ -230,10 +265,6 @@ export default function Courses() {
           setReviewRole("");
           setReviewRating(5);
           setReviewText("");
-          setReviewerImage(null);
-          if (fileInputRef.current) {
-               fileInputRef.current.value = "";
-          }
           setShowReviewsModal(true);
      };
 
@@ -246,18 +277,17 @@ export default function Courses() {
 
           setReviewSubmitting(true);
           try {
-               const formData = new FormData();
-               formData.append("name", reviewName);
-               formData.append("role", reviewRole);
-               formData.append("rating", String(reviewRating));
-               formData.append("text", reviewText);
-               if (reviewerImage) {
-                    formData.append("image", reviewerImage);
-               }
-
                const res = await fetch(`${API_URL}/courses/${selectedCourseForReviews._id}/reviews`, {
                     method: "POST",
-                    body: formData
+                    headers: {
+                         "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                         name: reviewName,
+                         role: reviewRole,
+                         rating: Number(reviewRating),
+                         text: reviewText
+                    })
                });
 
                if (res.ok) {
@@ -267,10 +297,6 @@ export default function Courses() {
                     setReviewRole("");
                     setReviewRating(5);
                     setReviewText("");
-                    setReviewerImage(null);
-                    if (fileInputRef.current) {
-                         fileInputRef.current.value = "";
-                    }
                     fetchCourses();
                } else {
                     alert("Failed to add review.");
@@ -297,6 +323,21 @@ export default function Courses() {
           } else {
                alert("Failed to delete review.");
           }
+     };
+
+     const addFaq = () => {
+          setFaq([...faq, { ques: "", ans: "" }]);
+     };
+
+     const updateFaq = (index, field, value) => {
+          const updated = [...faq];
+          updated[index][field] = value;
+          setFaq(updated);
+     };
+
+     const removeFaq = (index) => {
+          const updated = faq.filter((_, i) => i !== index);
+          setFaq(updated);
      };
 
      const addSection = () => {
@@ -662,6 +703,51 @@ export default function Courses() {
                                         </div>
                                    </div>
 
+                                   {/* FAQs Section */}
+                                   <div className="border-t border-gray-100 pt-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Course-Specific FAQs</p>
+                                             <button
+                                                  onClick={addFaq}
+                                                  className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
+                                             >
+                                                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                                                  Add FAQ
+                                             </button>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                             {faq.map((item, index) => (
+                                                  <div key={index} className="border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-2 relative">
+                                                       <button
+                                                            onClick={() => removeFaq(index)}
+                                                            className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-md bg-red-50 hover:bg-red-100 text-red-500 transition-colors"
+                                                       >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                       </button>
+                                                       <input
+                                                            placeholder="Question"
+                                                            value={item.ques}
+                                                            onChange={(e) => updateFaq(index, "ques", e.target.value)}
+                                                            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 text-gray-700 bg-white focus:outline-none focus:border-orange-300"
+                                                       />
+                                                       <textarea
+                                                            placeholder="Answer"
+                                                            value={item.ans}
+                                                            onChange={(e) => updateFaq(index, "ans", e.target.value)}
+                                                            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 text-gray-700 bg-white focus:outline-none focus:border-orange-300 min-h-16 resize-none"
+                                                       />
+                                                  </div>
+                                             ))}
+
+                                             {faq.length === 0 && (
+                                                  <div className="text-center py-4 text-gray-300">
+                                                       <p className="text-sm">No course-specific FAQs added yet.</p>
+                                                  </div>
+                                             )}
+                                        </div>
+                                   </div>
+
                               </div>
 
                               {/* Modal Footer */}
@@ -749,16 +835,7 @@ export default function Courses() {
                                                   </select>
                                              </div>
                                         </div>
-                                        <div>
-                                             <label className="block text-xs font-medium text-gray-500 mb-1">Reviewer Profile Image</label>
-                                             <input
-                                                  type="file"
-                                                  accept="image/*"
-                                                  ref={fileInputRef}
-                                                  onChange={(e) => setReviewerImage(e.target.files[0])}
-                                                  className={inputClass}
-                                             />
-                                        </div>
+
                                         <div>
                                              <label className="block text-xs font-medium text-gray-500 mb-1">Review Description</label>
                                              <textarea
@@ -796,11 +873,9 @@ export default function Courses() {
                                                   {selectedCourseForReviews.reviews.map((rev, index) => (
                                                        <div key={rev._id} className="bg-white border border-gray-100 rounded-xl p-3 flex justify-between items-start gap-4">
                                                             <div className="flex items-start gap-3">
-                                                                 <img
-                                                                      src={rev.image || `https://i.pravatar.cc/40?img=${(index % 20) + 1}`}
-                                                                      className="w-10 h-10 rounded-full object-cover border border-gray-100 shrink-0"
-                                                                      alt={rev.name}
-                                                                 />
+                                                                 <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-500 font-bold flex items-center justify-center text-xs border border-gray-100 shrink-0 select-none">
+                                                                      {getInitials(rev.name)}
+                                                                 </div>
                                                                  <div className="space-y-1">
                                                                       <div className="flex flex-wrap items-center gap-2">
                                                                            <span className="font-semibold text-sm text-gray-800">{rev.name}</span>
@@ -848,6 +923,12 @@ export default function Courses() {
                          </div>
                     </div>
                )}
+
+               {/* Toast Notification */}
+               <div className={`fixed bottom-6 right-6 flex items-center gap-2.5 bg-gray-900 border border-gray-800 text-white px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 z-50 ${toast.show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                    <span className="font-semibold text-xs">{toast.message}</span>
+               </div>
 
           </div>
      );

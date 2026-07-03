@@ -10,8 +10,8 @@ const PAGES = [
      { title: 'Privacy Policy', slug: 'privacy-policy' },
      { title: 'Disclaimer', slug: 'disclaimer' },
      { title: 'Blogs', slug: 'blogs' },
-     { title: 'Blog Details', slug: 'blog-details' },
-     { title: 'Course Details', slug: 'course-details' },
+     // { title: 'Blog Details', slug: 'blog-details' },
+     // { title: 'Course Details', slug: 'course-details' },
      { title: 'Courses', slug: 'courses' },
      { title: 'About Us', slug: 'about-us' },
 ];
@@ -43,7 +43,7 @@ function FaqItem({ item, index, onChange, onDelete }) {
                          </div>
 
                          <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-900 break-words whitespace-pre-wrap">
+                              <p className="text-sm font-semibold text-gray-900 wrap-break-word whitespace-pre-wrap">
                                    {item.ques || 'Untitled FAQ'}
                               </p>
                               <p className="text-xs text-gray-400 mt-0.5">

@@ -24,6 +24,13 @@ export default function Blogs() {
      const [seoKeywords, setSeoKeywords] = useState("");
      const [slug, setSlug] = useState("");
      const [description, setDescription] = useState("");
+     const [faq, setFaq] = useState([]);
+     const [toast, setToast] = useState({ show: false, message: "" });
+
+     const displayToast = (message) => {
+          setToast({ show: true, message });
+          setTimeout(() => setToast({ show: false, message: "" }), 3000);
+     };
 
      // Blog Page Titles States
      const [blogstitle, setBlogstitle] = useState("Our Blogs");
@@ -98,6 +105,7 @@ export default function Blogs() {
           setSeoDescription("");
           setSeoKeywords("");
           setSlug("");
+          setFaq([]);
           setShowModal(true);
      };
 
@@ -115,47 +123,70 @@ export default function Blogs() {
           setSeoDescription(blog.seoDescription || "");
           setSeoKeywords(blog.seoKeywords || "");
           setSlug(blog.slug || "");
+          setFaq(blog.faq || []);
           setShowModal(true);
      };
 
      const saveBlog = async () => {
           setUploading(true);
-          const formData = new FormData();
+          try {
+               const formData = new FormData();
 
-          formData.append("title", title);
-          formData.append("alt", alt);
-          formData.append("category", category);
-          formData.append("date", date);
-          formData.append("author", author);
-          formData.append("content", content);
-          formData.append("seoTitle", seoTitle);
-          formData.append("seoKeywords", seoKeywords);
-          formData.append("slug", slug);
-          formData.append("description", description);
-          formData.append("seoDescription", seoDescription);
-          if (image) formData.append("image", image);
+               formData.append("title", title);
+               formData.append("alt", alt);
+               formData.append("category", category);
+               formData.append("date", date);
+               formData.append("author", author);
+               formData.append("content", content);
+               formData.append("seoTitle", seoTitle);
+               formData.append("seoKeywords", seoKeywords);
+               formData.append("slug", slug);
+               formData.append("description", description);
+               formData.append("seoDescription", seoDescription);
+               formData.append("faq", JSON.stringify(faq));
+               if (image) formData.append("image", image);
 
-          if (editItem) {
-               await fetch(`${API_URL}/blogs/${editItem._id}`, {
-                    method: "PUT",
-                    body: formData
-               });
-          } else {
-               await fetch(`${API_URL}/blogs`, {
-                    method: "POST",
-                    body: formData
-               });
+               if (editItem) {
+                    const res = await fetch(`${API_URL}/blogs/${editItem._id}`, {
+                         method: "PUT",
+                         body: formData
+                    });
+                    if (res.ok) {
+                         displayToast("Blog post updated successfully!");
+                    } else {
+                         displayToast("Failed to update blog post.");
+                    }
+               } else {
+                    const res = await fetch(`${API_URL}/blogs`, {
+                         method: "POST",
+                         body: formData
+                    });
+                    if (res.ok) {
+                         displayToast("Blog post created successfully!");
+                    } else {
+                         displayToast("Failed to create blog post.");
+                    }
+               }
+               setShowModal(false);
+               fetchBlogs();
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
+          } finally {
+               setUploading(false);
           }
-          setUploading(false);
-          setShowModal(false);
-          fetchBlogs();
      };
 
      const deleteBlog = async (id) => {
           if (!window.confirm("Are you sure you want to delete this blog?")) return;
-          await fetch(`${API_URL}/blogs/${id}`, {
+          const res = await fetch(`${API_URL}/blogs/${id}`, {
                method: "DELETE"
           });
+          if (res.ok) {
+               displayToast("Blog post deleted successfully!");
+          } else {
+               displayToast("Failed to delete blog post.");
+          }
           fetchBlogs();
      };
 
@@ -446,6 +477,60 @@ export default function Blogs() {
                                              <Editor value={content} onChange={setContent} />
                                         </div>
                                    </div>
+
+                                   {/* FAQs Section */}
+                                   <div className="space-y-2 border-t border-gray-100 pt-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
+                                                  Blog-Specific FAQs
+                                             </label>
+                                             <button
+                                                  onClick={() => setFaq([...faq, { ques: "", ans: "" }])}
+                                                  className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                             >
+                                                  + Add FAQ
+                                             </button>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                             {faq.map((item, index) => (
+                                                  <div key={index} className="border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-2 relative">
+                                                       <button
+                                                            onClick={() => setFaq(faq.filter((_, i) => i !== index))}
+                                                            className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-md bg-red-50 hover:bg-red-100 text-red-500 transition-colors cursor-pointer"
+                                                       >
+                                                            ✕
+                                                       </button>
+                                                       <input
+                                                            placeholder="Question"
+                                                            value={item.ques}
+                                                            onChange={(e) => {
+                                                                 const updated = [...faq];
+                                                                 updated[index].ques = e.target.value;
+                                                                 setFaq(updated);
+                                                            }}
+                                                            className="w-[90%] text-sm border border-gray-200 rounded-xl px-3 py-2 text-gray-700 bg-white focus:outline-none focus:border-orange-300"
+                                                       />
+                                                       <textarea
+                                                            placeholder="Answer"
+                                                            value={item.ans}
+                                                            onChange={(e) => {
+                                                                 const updated = [...faq];
+                                                                 updated[index].ans = e.target.value;
+                                                                 setFaq(updated);
+                                                            }}
+                                                            className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 text-gray-700 bg-white focus:outline-none focus:border-orange-300 min-h-16 resize-none"
+                                                       />
+                                                  </div>
+                                             ))}
+
+                                             {faq.length === 0 && (
+                                                  <div className="text-center py-4 text-gray-300">
+                                                       <p className="text-sm">No blog-specific FAQs added yet.</p>
+                                                  </div>
+                                             )}
+                                        </div>
+                                   </div>
                               </div>
 
                               {/* Modal Footer */}
@@ -478,6 +563,12 @@ export default function Blogs() {
                          </div>
                     </div>
                )}
+
+               {/* Toast Notification */}
+               <div className={`fixed bottom-6 right-6 flex items-center gap-2.5 bg-gray-900 border border-gray-800 text-white px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 z-50 ${toast.show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                    <span className="font-semibold text-xs">{toast.message}</span>
+               </div>
           </div>
      );
 }

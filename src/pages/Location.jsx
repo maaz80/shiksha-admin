@@ -128,6 +128,9 @@ export default function Locations() {
                setLocationModal(null);
                await fetchLocations();
                displayToast("Location saved successfully!");
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
           } finally {
                setLoadingAction(null);
           }
@@ -208,6 +211,9 @@ export default function Locations() {
                setItemModal(null);
                await fetchLocations();
                displayToast("Item saved successfully!");
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
           } finally {
                setLoadingAction(null);
           }
@@ -251,6 +257,9 @@ export default function Locations() {
                setHeroModal(null);
                await fetchLocations();
                displayToast("Hero saved successfully!");
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
           } finally {
                setLoadingAction(null);
           }
@@ -292,6 +301,9 @@ export default function Locations() {
                setPageModal(null);
                await fetchLocations();
                displayToast("Page saved successfully!");
+          } catch (err) {
+               console.error(err);
+               displayToast("Network error. Please check your connection.");
           } finally {
                setLoadingAction(null);
           }
