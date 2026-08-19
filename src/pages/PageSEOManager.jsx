@@ -5,90 +5,111 @@ const API_URL = import.meta.env?.VITE_BACKEND_URL || 'http://localhost:5000/api'
 
 const PAGES = [
      { id: 'home', title: 'Home', slug: '/' },
+     { id: 'dashboard', title: 'Dashboard', slug: '/dashboard' },
      { id: 'contact-us', title: 'Contact Us', slug: '/contact-us' },
      { id: 'privacy-policy', title: 'Privacy Policy', slug: '/privacy-policy' },
      { id: 'disclaimer', title: 'Disclaimer', slug: '/disclaimer' },
-     { id: 'blogs', title: 'Blogs', slug: '/blogs' },
-     { id: 'not-found', title: '404 Page', slug: '*' },
+     { id: 'terms-and-conditions-enrolment', title: 'Terms & Conditions Enrolment', slug: '/terms-and-conditions-enrolment' },
+     { id: 'blogs', title: 'Blogs', slug: '/blog' },
      { id: 'courses', title: 'Courses', slug: '/courses' },
      { id: 'about-us', title: 'About Us', slug: '/about-us' },
+     { id: 'search', title: 'Search Page', slug: '/search' },
+     { id: 'not-found', title: '404 Page', slug: '*' },
 ];
 
 function PageRow({ page, seoData, onChange, onSave, saving, saved, loading }) {
      return (
-          <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_1fr_auto] gap-6 items-center p-5 border-b border-gray-100 hover:bg-gray-50/50 transition-colors last:border-none">
-               {/* Page Name */}
-               <div className="flex flex-col gap-0.5 min-w-0">
-                    <span className="font-bold text-gray-900 text-sm truncate">{page.title}</span>
-                    <span className="text-xs text-gray-400 font-mono truncate">{page.slug}</span>
+          <div className="flex flex-col gap-4 p-5 border-b border-gray-100 hover:bg-gray-50/50 transition-colors last:border-none">
+               <div className="grid grid-cols-1 lg:grid-cols-[150px_1fr_1fr_auto] gap-4 items-center">
+                    {/* Page Name */}
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                         <span className="font-bold text-gray-900 text-sm truncate">{page.title}</span>
+                         <span className="text-xs text-gray-400 font-mono truncate">{page.slug}</span>
+                    </div>
+
+                    {loading ? (
+                         <div className="lg:col-span-2 h-10 bg-gray-150/60 animate-pulse rounded-xl w-full"></div>
+                    ) : (
+                         <>
+                              {/* Meta Title */}
+                              <div className="relative">
+                                   <input
+                                        type="text"
+                                        value={seoData?.title || ''}
+                                        maxLength={60}
+                                        onChange={e => onChange('title', e.target.value)}
+                                        placeholder="Meta title..."
+                                        className="w-full px-3.5 py-2 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                                   />
+                                   <span className={`absolute right-3 bottom-[-18px] text-[9px] font-semibold ${(seoData?.title || '').length > 55 ? 'text-red-500' : 'text-gray-400'}`}>
+                                        {(seoData?.title || '').length}/60
+                                   </span>
+                              </div>
+
+                              {/* Meta Description */}
+                              <div className="relative">
+                                   <input
+                                        type="text"
+                                        value={seoData?.description || ''}
+                                        maxLength={200}
+                                        onChange={e => onChange('description', e.target.value)}
+                                        placeholder="Meta description..."
+                                        className="w-full px-3.5 py-2 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                                   />
+                                   <span className={`absolute right-3 bottom-[-18px] text-[9px] font-semibold ${(seoData?.description || '').length > 190 ? 'text-red-500' : 'text-gray-400'}`}>
+                                        {(seoData?.description || '').length}/200
+                                   </span>
+                              </div>
+                         </>
+                    )}
+
+                    {/* Save Button */}
+                    <div className="flex justify-end pt-3 lg:pt-0">
+                         <button
+                              onClick={onSave}
+                              disabled={loading || saving || !seoData?.title || !seoData?.description}
+                              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 min-w-[80px] flex items-center justify-center cursor-pointer shadow-sm ${
+                                   saved
+                                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100'
+                                        : loading || saving || !seoData?.title || !seoData?.description
+                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                                             : 'bg-primary hover:bg-primary-hover text-white shadow-primary/20'
+                              }`}
+                         >
+                              {saving ? (
+                                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : saved ? (
+                                   '✓ Saved'
+                              ) : (
+                                   'Save'
+                              )}
+                         </button>
+                    </div>
                </div>
 
-               {loading ? (
-                    <div className="lg:col-span-2 h-10 bg-gray-150/60 animate-pulse rounded-xl w-full"></div>
-               ) : (
-                    <>
-                         {/* Meta Title */}
-                         <div className="relative">
-                              <input
-                                   type="text"
-                                   value={seoData.title}
-                                   maxLength={60}
-                                   onChange={e => onChange('title', e.target.value)}
-                                   placeholder="Meta title..."
-                                   className="w-full px-4 py-2.5 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200"
-                              />
-                              <span className={`absolute right-3.5 bottom-[-18px] text-[9px] font-semibold ${seoData.title.length > 55 ? 'text-red-500' : 'text-gray-400'}`}>
-                                   {seoData.title.length}/60
-                              </span>
-                         </div>
-
-                         {/* Meta Description */}
-                         <div className="relative">
-                              <input
-                                   type="text"
-                                   value={seoData.description}
-                                   maxLength={200}
-                                   onChange={e => onChange('description', e.target.value)}
-                                   placeholder="Meta description..."
-                                   className="w-full px-4 py-2.5 text-xs border border-gray-200 rounded-xl bg-white text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200"
-                              />
-                              <span className={`absolute right-3.5 bottom-[-18px] text-[9px] font-semibold ${seoData.description.length > 190 ? 'text-red-500' : 'text-gray-400'}`}>
-                                   {seoData.description.length}/200
-                              </span>
-                         </div>
-                    </>
+               {/* Dedicated Schema JSON-LD Field (No character limit!) */}
+               {!loading && (
+                    <div className="w-full pt-1">
+                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                              Custom Schema Script (JSON-LD - No Character Limit)
+                         </label>
+                         <textarea
+                              value={seoData?.schema || ''}
+                              onChange={e => onChange('schema', e.target.value)}
+                              placeholder='Paste full Schema JSON-LD code here... e.g. <script type="application/ld+json">{"@context": "https://schema.org", ...}</script>'
+                              rows={2}
+                              className="w-full px-3.5 py-2 text-xs font-mono border border-gray-200 rounded-xl bg-gray-50/50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-200"
+                         />
+                    </div>
                )}
-
-               {/* Save Button */}
-               <div className="flex justify-end pt-3 lg:pt-0">
-                    <button
-                         onClick={onSave}
-                         disabled={loading || saving || !seoData?.title || !seoData?.description}
-                         className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 min-w-[80px] flex items-center justify-center cursor-pointer shadow-sm ${
-                              saved
-                                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100'
-                                   : loading || saving || !seoData?.title || !seoData?.description
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
-                                        : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-100'
-                         }`}
-                    >
-                         {saving ? (
-                              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                         ) : saved ? (
-                              '✓ Saved'
-                         ) : (
-                              'Save'
-                         )}
-                    </button>
-               </div>
           </div>
      );
 }
 
 export default function PageSEOManager() {
-     // Per-page SEO state: { [pageId]: { title, description, keywords } }
+     // Per-page SEO state: { [pageId]: { title, description, schema } }
      const [seoMap, setSeoMap] = useState(() =>
-          Object.fromEntries(PAGES.map(p => [p.id, { title: '', description: '', keywords: '' }]))
+          Object.fromEntries(PAGES.map(p => [p.id, { title: '', description: '', schema: '' }]))
      );
      const [loadingMap, setLoadingMap] = useState({});
      const [savingMap, setSavingMap] = useState({});
@@ -111,7 +132,7 @@ export default function PageSEOManager() {
                     [pageId]: {
                          title: data.title || '',
                          description: data.description || '',
-                         keywords: data.keywords || '',
+                         schema: data.schema || '',
                     },
                }));
           } catch (err) {
@@ -163,12 +184,12 @@ export default function PageSEOManager() {
                     {/* Direct Row Layout Container */}
                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                          {/* Column Headers */}
-                         <div className="hidden lg:grid grid-cols-[180px_1fr_1fr_auto] gap-6 px-5 py-3.5 bg-gray-50 border-b border-gray-200">
+                         <div className="hidden lg:grid grid-cols-[150px_1fr_1fr_auto] gap-4 px-5 py-3.5 bg-gray-50 border-b border-gray-200">
                               {['Page Name', 'Meta Title', 'Meta Description', 'Action'].map((label, i) => (
                                    <span
                                         key={i}
                                         className={`text-[10px] font-bold text-gray-400 uppercase tracking-wider ${
-                                             i === 3 ? 'text-right pr-12' : ''
+                                             i === 3 ? 'text-right pr-6' : ''
                                         }`}
                                    >
                                         {label}

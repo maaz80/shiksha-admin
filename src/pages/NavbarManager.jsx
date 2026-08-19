@@ -14,7 +14,7 @@ export default function NavbarManager() {
      const [logo, setLogo] = useState("");
      const [logoFile, setLogoFile] = useState(null);
      const [buttonName, setButtonName] = useState("All Courses");
-     const [searchPlaceholder, setSearchPlaceholder] = useState("Search your course");
+     const [searchPlaceholder, setSearchPlaceholder] = useState("What do you want to learn ?");
      const [moreTitle, setMoreTitle] = useState("More");
      const [moreDropdownItems, setMoreDropdownItems] = useState([]);
      const [logoutButtonName, setLogoutButtonName] = useState("Logout");
@@ -32,9 +32,9 @@ export default function NavbarManager() {
                     const data = await res.json();
                     setLogo(data.logo || "");
                     setButtonName(data.buttonName || "All Courses");
-                    setSearchPlaceholder(data.searchPlaceholder || "Search your course");
+                    setSearchPlaceholder(data.searchPlaceholder || "What do you want to learn ?");
                     setLogoutButtonName(data.logoutButtonName || "Logout");
-                    
+
                     if (data.moreItems) {
                          setMoreTitle(data.moreItems.title || "More");
                          setMoreDropdownItems(data.moreItems.dropdown_items || []);
@@ -44,7 +44,7 @@ export default function NavbarManager() {
                               {
                                    title: data.dropdownName || "Links",
                                    items: data.dropdownItems || []
-                               }
+                              }
                          ]);
                     }
                }
@@ -97,7 +97,7 @@ export default function NavbarManager() {
           if (e) e.preventDefault();
           try {
                setSaving(true);
-               
+
                const formData = new FormData();
                if (logoFile) {
                     formData.append("logo", logoFile);
@@ -107,11 +107,11 @@ export default function NavbarManager() {
                formData.append("buttonName", buttonName);
                formData.append("searchPlaceholder", searchPlaceholder);
                formData.append("dropdownName", moreTitle);
-               
+
                // Flatten for legacy backward compatibility
                const legacyDropdownItems = moreDropdownItems.flatMap(cat => cat.items || []).filter(item => item.name && item.link);
                formData.append("dropdownItems", JSON.stringify(legacyDropdownItems));
-               
+
                formData.append("logoutButtonName", logoutButtonName);
 
                // New multi-column JSON string
@@ -147,7 +147,7 @@ export default function NavbarManager() {
           }
      };
 
-     const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200";
+     const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-200";
      const labelClass = "block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5";
 
      return (
@@ -167,7 +167,7 @@ export default function NavbarManager() {
                          <button
                               onClick={handleSave}
                               disabled={saving || loading}
-                              className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer disabled:cursor-not-allowed shrink-0"
+                              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer disabled:cursor-not-allowed shrink-0"
                          >
                               <HiOutlineSave className="w-4 h-4" />
                               <span>{saving ? "Saving..." : "Save Settings"}</span>
@@ -176,7 +176,7 @@ export default function NavbarManager() {
 
                     {loading ? (
                          <div className="h-64 rounded-2xl border border-gray-200 bg-white flex flex-col items-center justify-center text-gray-400 shadow-sm">
-                              <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
                               <span className="text-sm font-medium">Loading Navbar Data...</span>
                          </div>
                     ) : (
@@ -185,7 +185,7 @@ export default function NavbarManager() {
                               <div className="lg:col-span-2 space-y-6">
                                    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
                                         <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Header Configuration</h2>
-                                        
+
                                         <div className="space-y-1.5">
                                              <label className={labelClass}>Logo Image</label>
                                              <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center">
@@ -210,7 +210,7 @@ export default function NavbarManager() {
                                                             </div>
                                                        )}
                                                   </div>
-                                                  
+
                                                   <div className="flex-1 w-full relative">
                                                        <div className="border border-dashed border-gray-300 hover:border-orange-500 rounded-xl px-4 py-3 bg-gray-50/50 hover:bg-orange-50/10 transition flex items-center justify-center gap-2 cursor-pointer text-center relative group min-h-16">
                                                             <input
@@ -241,7 +241,7 @@ export default function NavbarManager() {
                                                        value={searchPlaceholder}
                                                        onChange={(e) => setSearchPlaceholder(e.target.value)}
                                                        className={inputClass}
-                                                       placeholder="e.g. Search your course"
+                                                       placeholder="e.g. What do you want to learn ?"
                                                        required
                                                   />
                                              </div>

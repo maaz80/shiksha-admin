@@ -64,7 +64,7 @@ export default function Home() {
                name: "Total Courses",
                value: stats.courses,
                icon: HiOutlineAcademicCap,
-               color: "text-orange-600 bg-orange-50 border-orange-100",
+               color: "text-primary bg-primary/10 border-primary/20",
                path: "/courses",
                desc: "Manage classes, lessons, and pricing structures."
           },
@@ -186,7 +186,7 @@ export default function Home() {
                                         </div>
                                         <Link
                                              to={card.path}
-                                             className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 transition-colors"
+                                             className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-hover transition-colors"
                                         >
                                              <span>Manage</span>
                                              <HiOutlineArrowSmRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -210,13 +210,13 @@ export default function Home() {
                                         key={action.name}
                                         to={action.path}
                                         className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 group flex gap-4 items-start"
-                                    >
-                                        <div className="p-3 bg-gray-50 text-gray-500 rounded-xl border border-gray-100 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100 transition-all shrink-0">
+                                   >
+                                        <div className="p-3 bg-gray-50 text-gray-500 rounded-xl border border-gray-100 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20 transition-all shrink-0">
                                              <Icon className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-1">
                                              <div className="flex items-center gap-1">
-                                                  <h3 className="font-bold text-gray-900 text-sm group-hover:text-orange-500 transition-colors">
+                                                  <h3 className="font-bold text-gray-900 text-sm group-hover:text-primary transition-colors">
                                                        {action.name}
                                                   </h3>
                                                   <HiOutlineArrowSmRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />

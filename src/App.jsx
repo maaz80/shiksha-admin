@@ -14,6 +14,8 @@ import AboutData from "./pages/AboutData"
 import PolicyData from "./pages/PolicyData"
 import ContactData from "./pages/ContactData"
 import NavbarManager from "./pages/NavbarManager"
+import Testimonials from "./pages/Testimonials"
+import UserAccessManager from "./pages/UserAccessManager"
 
 import AdminLayout from "./components/AdminLayout"
 
@@ -31,9 +33,11 @@ const App = () => {
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/' element={protectedPage(<Home />)} />
+        <Route path='/user-access' element={protectedPage(<UserAccessManager />)} />
         <Route path='/blogs' element={protectedPage(<Blogs />)} />
         <Route path='/courses' element={protectedPage(<Courses />)} />
         <Route path='/location' element={protectedPage(<Locations />)} />
+        <Route path='/testimonials' element={protectedPage(<Testimonials />)} />
         <Route path='/site-meta' element={protectedPage(<PageSEOManager />)} />
         <Route path='/faq' element={protectedPage(<FaqManager />)} />
         <Route path='/footer' element={protectedPage(<FooterManager />)} />
@@ -48,5 +52,6 @@ const App = () => {
     </div>
   )
 }
+
 
 export default App

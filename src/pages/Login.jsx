@@ -49,13 +49,13 @@ export default function Login() {
      return (
           <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
                {/* Background Decorative Blobs */}
-               <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-orange-100/40 blur-3xl" />
-               <div className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 w-96 h-96 rounded-full bg-orange-100/30 blur-3xl" />
+               <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+               <div className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
 
                <div className="w-full max-w-md z-10 space-y-8">
                     {/* Brand / Logo */}
                     <div className="flex flex-col items-center justify-center text-center space-y-3">
-                         <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-orange-500/20">
+                         <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-primary/20">
                               S
                          </div>
                          <div>
@@ -84,7 +84,7 @@ export default function Login() {
                                              type="text"
                                              value={username}
                                              onChange={(event) => setUsername(event.target.value)}
-                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200"
+                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-200"
                                              placeholder="admin"
                                              autoComplete="username"
                                              required
@@ -105,7 +105,7 @@ export default function Login() {
                                              type="password"
                                              value={password}
                                              onChange={(event) => setPassword(event.target.value)}
-                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200"
+                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-200"
                                              placeholder="••••••••"
                                              autoComplete="current-password"
                                              required
@@ -125,7 +125,7 @@ export default function Login() {
                               <button
                                    type="submit"
                                    disabled={loading}
-                                   className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white py-3 rounded-xl font-semibold shadow-lg shadow-orange-500/10 hover:-translate-y-0.5 disabled:translate-y-0 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed text-sm"
+                                   className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white py-3 rounded-xl font-semibold shadow-lg shadow-primary/20 hover:-translate-y-0.5 disabled:translate-y-0 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed text-sm"
                               >
                                    {loading ? (
                                         <>

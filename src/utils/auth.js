@@ -11,3 +11,8 @@ export const clearAdminToken = () => {
 };
 
 export const isAdminLoggedIn = () => Boolean(getAdminToken());
+
+export const getAdminHeader = () => {
+     const token = getAdminToken();
+     return token ? { Authorization: `Bearer ${token}` } : {};
+};

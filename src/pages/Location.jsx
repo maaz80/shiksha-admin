@@ -24,8 +24,15 @@ const normalizeHero = (hero) => ({
 const normalizePageSection = (section) => ({
      title: section?.title || "",
      description: section?.description || "",
-     cards: Array.isArray(section?.cards) ? section.cards : []
+     cards: Array.isArray(section?.cards) ? section.cards.map(c => ({
+          title: c?.title || "",
+          head: c?.head || "",
+          subhead: c?.subhead || "",
+          image: c?.image || "",
+          para: c?.para || ""
+     })) : []
 });
+
 
 const normalizePage = (page) => ({
      help: normalizePageSection(page?.help),
@@ -57,11 +64,13 @@ const stripPageFiles = (page) => ({
      location: {
           ...page.location,
           cards: page.location.cards.map(({ file, ...card }) => ({
+               title: card.title || "",
                image: card.image || "",
                para: card.para || ""
           }))
      }
 });
+
 
 const getErrorMessage = async (res, fallback) => {
      const data = await res.json().catch(() => ({}));
@@ -324,8 +333,9 @@ export default function Locations() {
      const openCardModal = (section, card = null, index = null) => {
           setCardModal(section);
           setEditingCardIndex(index);
-          setTempCard(card ? { ...card } : section === "help" ? { head: "", subhead: "", para: "" } : { image: "", para: "" });
+          setTempCard(card ? { ...card } : section === "help" ? { head: "", subhead: "", para: "" } : { title: "", image: "", para: "" });
      };
+
 
      const closeCardModal = () => {
           setCardModal(null);
@@ -384,7 +394,7 @@ export default function Locations() {
 
                          <button
                               onClick={() => openLocationModal()}
-                              className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
+                              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
                          >
                               <span>Add Location</span>
                          </button>
@@ -397,7 +407,7 @@ export default function Locations() {
                                         <h2 className="text-lg font-bold text-gray-900">{location.title || "Untitled Location"}</h2>
 
                                         <div className="flex items-center gap-2">
-                                             <button onClick={() => openItemModal(location)} className="bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-100 text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer">
+                                             <button onClick={() => openItemModal(location)} className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer">
                                                   + Add Item
                                              </button>
                                              <button onClick={() => openLocationModal(location)} className="bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer">
@@ -415,7 +425,7 @@ export default function Locations() {
                                                   <div>
                                                        <div className="flex items-start justify-between gap-3 mb-2">
                                                             <h3 className="font-bold text-gray-900 text-sm">{item.title || "Untitled Item"}</h3>
-                                                            <button onClick={() => openItemModal(location, item)} className="text-orange-600 hover:text-orange-700 text-xs font-bold cursor-pointer">
+                                                            <button onClick={() => openItemModal(location, item)} className="text-primary hover:text-primary-hover text-xs font-bold cursor-pointer">
                                                                  Edit
                                                             </button>
                                                        </div>
@@ -423,7 +433,7 @@ export default function Locations() {
                                                             <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed mb-4">{item.description}</p>
                                                        )}
                                                        <div className="flex items-center gap-2 text-[10px] font-semibold text-gray-500 bg-white border border-gray-100 px-2.5 py-1 rounded-lg w-fit">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                                                             <span>{item.hero?.title ? "Hero Active" : "Hero Pending"}</span>
                                                             <span className="text-gray-300">|</span>
                                                             <span>{hasPageContent(item.page) ? "Page Configured" : "Page Pending"}</span>
@@ -431,7 +441,7 @@ export default function Locations() {
                                                   </div>
 
                                                   <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-gray-100">
-                                                       <button onClick={() => openHeroModal(location, item)} className="flex-1 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold shadow-sm shadow-orange-100 cursor-pointer text-center">
+                                                       <button onClick={() => openHeroModal(location, item)} className="flex-1 px-3 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm shadow-primary/20 cursor-pointer text-center">
                                                             Hero
                                                        </button>
                                                        <button onClick={() => openPageModal(location, item)} className="flex-1 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-xs font-bold shadow-sm shadow-purple-100 cursor-pointer text-center">
@@ -516,7 +526,7 @@ export default function Locations() {
                                    <div className="space-y-2 border-t border-gray-100 pt-3">
                                         <div className="flex justify-between items-center mb-1">
                                              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Key Highlights / Points</label>
-                                             <button onClick={() => setHeroForm({ ...heroForm, points: [...heroForm.points, ""] })} className="text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">
+                                             <button onClick={() => setHeroForm({ ...heroForm, points: [...heroForm.points, ""] })} className="text-xs font-bold text-primary hover:text-primary-hover bg-primary/10 hover:bg-primary/20 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">
                                                   + Add Highlight
                                              </button>
                                         </div>
@@ -542,7 +552,7 @@ export default function Locations() {
                                         </div>
                                         <div className="flex gap-3">
                                              <button onClick={() => setPageModal(null)} className="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">Cancel</button>
-                                             <button disabled={loadingAction === "page"} onClick={() => savePage(pageForm)} className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl shadow-md shadow-orange-200 transition-all cursor-pointer disabled:bg-orange-300 disabled:cursor-not-allowed flex items-center gap-2">
+                                             <button disabled={loadingAction === "page"} onClick={() => savePage(pageForm)} className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-md shadow-primary/20 transition-all cursor-pointer disabled:bg-primary/50 disabled:cursor-not-allowed flex items-center gap-2">
                                                   {loadingAction === "page" && <Spinner />}
                                                   {loadingAction === "page" ? "Saving Changes..." : "Save Page Content"}
                                              </button>
@@ -555,7 +565,7 @@ export default function Locations() {
                                                   {pageForm.help.cards.map((card, index) => (
                                                        <Card key={index}>
                                                             <h4 className="text-sm font-bold text-gray-900 mb-1">{card.head}</h4>
-                                                            <p className="text-xs font-semibold text-orange-600 mb-3">{card.subhead}</p>
+                                                            <p className="text-xs font-semibold text-primary mb-3">{card.subhead}</p>
                                                             <p className="text-xs text-gray-400 leading-normal line-clamp-4">{card.para}</p>
                                                             <EditBtn onClick={() => openCardModal("help", card, index)} />
                                                             <DeleteBtn onClick={() => deletePageCard("help", index)} />
@@ -577,6 +587,7 @@ export default function Locations() {
                                                                       <span className="text-gray-400 text-xs">No Image Selected</span>
                                                                  </div>
                                                             )}
+                                                            {card.title && <h4 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">{card.title}</h4>}
                                                             <p className="text-xs text-gray-500 leading-normal line-clamp-3">{card.para}</p>
                                                             <EditBtn onClick={() => openCardModal("location", card, index)} />
                                                             <DeleteBtn onClick={() => deletePageCard("location", index)} />
@@ -651,6 +662,10 @@ export default function Locations() {
                               {cardModal === "location" && (
                                    <div className="space-y-4">
                                         <div className="space-y-1.5">
+                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Service Card Title</label>
+                                             <input value={tempCard.title || ""} placeholder="e.g. Brand Identity & Design" className={inputClass} onChange={(e) => setTempCard({ ...tempCard, title: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-1.5">
                                              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">Upload Service Image</label>
                                              <ImageUploader initialImage={tempCard.image} setImage={(file) => setTempCard({ ...tempCard, file })} />
                                         </div>
@@ -667,7 +682,7 @@ export default function Locations() {
 
                     {/* Toast Notification */}
                     <div className={`fixed bottom-6 right-6 flex items-center gap-2.5 bg-gray-900 border border-gray-800 text-white px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 z-50 ${toast.show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}>
-                         <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                          <span className="font-semibold text-xs">{toast.message}</span>
                     </div>
                </div>
@@ -675,7 +690,7 @@ export default function Locations() {
      );
 }
 
-const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all duration-200";
+const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-200";
 const textareaClass = `${inputClass} resize-none`;
 
 const Modal = ({ title, onClose, children }) => (
@@ -693,7 +708,7 @@ const Modal = ({ title, onClose, children }) => (
 const ModalActions = ({ onCancel, onSave, saveLabel = "Save", loading = false }) => (
      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-2 shrink-0">
           <button disabled={loading} onClick={onCancel} className="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm disabled:opacity-50">Cancel</button>
-          <button disabled={loading} onClick={onSave} className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-200 transition-all cursor-pointer disabled:bg-orange-300 disabled:cursor-not-allowed flex items-center gap-1.5">
+          <button disabled={loading} onClick={onSave} className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer disabled:bg-primary/50 disabled:cursor-not-allowed flex items-center gap-1.5">
                {loading && <Spinner />}
                <span>{loading ? "Saving..." : saveLabel}</span>
           </button>
@@ -708,7 +723,7 @@ const PageSection = ({ title, data, onChange, onAdd, children }) => (
      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
                <h2 className="text-base font-bold text-gray-900">{title}</h2>
-               <button onClick={onAdd} className="bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-orange-100 transition-colors cursor-pointer">+ Add Card</button>
+               <button onClick={onAdd} className="bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded-xl border border-primary/20 transition-colors cursor-pointer">+ Add Card</button>
           </div>
 
           <div className="space-y-4 mb-6 bg-gray-50/50 p-5 rounded-xl border border-gray-200">
@@ -733,7 +748,7 @@ const Card = ({ children }) => (
 );
 
 const EditBtn = ({ onClick }) => (
-     <button onClick={onClick} title="Edit Card" className="absolute top-3 right-11 bg-orange-50 text-orange-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white p-1.5 rounded-lg border border-orange-100 transition-all duration-200 shadow-sm focus:opacity-100 outline-none cursor-pointer">
+     <button onClick={onClick} title="Edit Card" className="absolute top-3 right-11 bg-primary/10 text-primary opacity-0 group-hover:opacity-100 hover:bg-primary hover:text-white p-1.5 rounded-lg border border-primary/20 transition-all duration-200 shadow-sm focus:opacity-100 outline-none cursor-pointer">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>

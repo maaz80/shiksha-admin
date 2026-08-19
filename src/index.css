@@ -2,6 +2,18 @@
 
 @theme {
   --font-sans: "Poppins", sans-serif;
+  --color-primary: #0071E5;
+  --color-primary-hover: #024d9b;
+  --color-primary-light: #f0f7ff;
+  --color-secondary: #26394D;
+  --color-orange-50: #f0f7ff;
+  --color-orange-100: #dbeafe;
+  --color-orange-200: #bfdbfe;
+  --color-orange-300: #93c5fd;
+  --color-orange-400: #3b82f6;
+  --color-orange-500: #0071E5;
+  --color-orange-600: #024d9b;
+  --color-orange-700: #1e3a8a;
 }
 
 /* Force Poppins on all elements, including inputs and form elements */

@@ -14,8 +14,6 @@ export default function FooterManager() {
 
      // New states for Global Settings
      const [activeTab, setActiveTab] = useState("columns");
-     const [buttonname, setButtonname] = useState("");
-     const [buttontitle, setButtontitle] = useState("");
      const [copyright, setCopyright] = useState("");
      const [socials, setSocials] = useState([]);
      const [navigation, setNavigation] = useState([]);
@@ -37,8 +35,6 @@ export default function FooterManager() {
                const res = await fetch(`${API_URL}/footer-columns/global`);
                if (res.ok) {
                     const data = await res.json();
-                    setButtonname(data.buttonname || "");
-                    setButtontitle(data.buttontitle || "");
                     setCopyright(data.copyright || "");
                     setSocials(data.socials || []);
                     setNavigation(data.navigation || []);
@@ -88,8 +84,6 @@ export default function FooterManager() {
           setSaving(true);
           try {
                const payload = {
-                    buttonname,
-                    buttontitle,
                     copyright,
                     socials: socials.filter(s => s.icon && s.path),
                     navigation: navigation.filter(n => n.itemname && n.itempath)
@@ -248,7 +242,7 @@ export default function FooterManager() {
                          onClick={() => setActiveTab("columns")}
                          className={`pb-3 text-sm font-bold border-b-2 transition-all duration-200 cursor-pointer ${
                               activeTab === "columns"
-                                   ? "border-orange-500 text-orange-600"
+                                   ? "border-primary text-primary"
                                    : "border-transparent text-gray-500 hover:text-gray-700"
                          }`}
                     >
@@ -258,7 +252,7 @@ export default function FooterManager() {
                          onClick={() => setActiveTab("settings")}
                          className={`pb-3 text-sm font-bold border-b-2 transition-all duration-200 cursor-pointer ${
                               activeTab === "settings"
-                                   ? "border-orange-500 text-orange-600"
+                                   ? "border-primary text-primary"
                                    : "border-transparent text-gray-500 hover:text-gray-700"
                          }`}
                     >
@@ -326,30 +320,8 @@ export default function FooterManager() {
                          <form onSubmit={saveSettings} className="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 lg:p-8 space-y-8">
                               {/* General Information Card */}
                               <div className="space-y-4">
-                                   <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">General Button & Title Settings</h2>
-                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Social Section Heading / Button Title</label>
-                                             <input
-                                                  type="text"
-                                                  placeholder="e.g., Follow us!"
-                                                  value={buttontitle}
-                                                  onChange={(e) => setButtontitle(e.target.value)}
-                                                  className={inputClass}
-                                             />
-                                        </div>
-                                        <div>
-                                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Button Text (Name)</label>
-                                             <input
-                                                  type="text"
-                                                  placeholder="e.g., Refer & Earn"
-                                                  value={buttonname}
-                                                  onChange={(e) => setButtonname(e.target.value)}
-                                                  className={inputClass}
-                                             />
-                                        </div>
-                                   </div>
-                                   <div className="mt-4">
+                                   <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">General Footer Settings</h2>
+                                   <div>
                                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Footer Copyright Text</label>
                                         <input
                                              type="text"

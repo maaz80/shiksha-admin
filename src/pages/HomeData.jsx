@@ -376,9 +376,9 @@ export default function HomeData() {
           }
      };
 
-     const inputClass = "w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all";
+     const inputClass = "w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all";
      const labelClass = "block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wider";
-     const tabBtnClass = (tab) => `px-5 py-3 font-semibold text-sm rounded-lg transition-all ${activeTab === tab ? "bg-orange-500 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`;
+     const tabBtnClass = (tab) => `px-5 py-3 font-semibold text-sm rounded-lg transition-all ${activeTab === tab ? "bg-primary text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`;
 
      if (loading) {
           return (
@@ -399,7 +399,7 @@ export default function HomeData() {
                     <button
                          onClick={handleSaveAll}
                          disabled={saving}
-                         className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed shrink-0"
+                         className="bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed shrink-0"
                     >
                          <HiOutlineSave className="text-lg" />
                          {saving ? "Saving Changes..." : "Save All Data"}

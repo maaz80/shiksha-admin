@@ -83,7 +83,7 @@ function FaqItem({ item, index, onChange, onDelete }) {
                                    value={item.ques}
                                    onChange={(e) => onChange(index, 'ques', e.target.value)}
                                    placeholder="Enter FAQ question..."
-                                   className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none resize-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 font-sans"
+                                   className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none resize-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-sans"
                               />
                          </div>
 
@@ -97,7 +97,7 @@ function FaqItem({ item, index, onChange, onDelete }) {
                                    value={item.ans}
                                    onChange={(e) => onChange(index, 'ans', e.target.value)}
                                    placeholder="Enter FAQ answer..."
-                                   className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none resize-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 font-sans"
+                                   className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none resize-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-sans"
                               />
                          </div>
                     </div>
@@ -120,35 +120,33 @@ export default function FaqManager() {
           setTimeout(() => setToast({ show: false, message: "" }), 3000);
      };
 
-     // Close Dropdown on outside click
      useEffect(() => {
-          const handleClick = (e) => {
-               if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+          const handleClickOutside = (event) => {
+               if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                     setOpenDropdown(false);
                }
           };
-          document.addEventListener('mousedown', handleClick);
-          return () => {
-               document.removeEventListener('mousedown', handleClick);
-          };
+
+          document.addEventListener('mousedown', handleClickOutside);
+          return () => document.removeEventListener('mousedown', handleClickOutside);
      }, []);
 
-     // Fetch FAQ
-     useEffect(() => {
-          if (selectedPage?.slug) {
-               fetchFaqData(selectedPage.slug);
-          }
-     }, [selectedPage]);
-
-     const fetchFaqData = async (slug) => {
+     const fetchFaqs = async (slug) => {
           try {
                setLoading(true);
-               const response = await fetch(`${API_URL}/pages/${slug}/faq`);
+               const response = await fetch(`${API_URL}/pages/${slug}`);
+               if (!response.ok) {
+                    throw new Error("Failed to fetch FAQ content");
+               }
                const data = await response.json();
-               setFormData({
-                    title: data?.title || 'FAQ',
-                    faq: data?.faq || [],
-               });
+               if (data && (data.title || data.faq)) {
+                    setFormData({
+                         title: data.title || "FAQ",
+                         faq: Array.isArray(data.faq) ? data.faq : [],
+                    });
+               } else {
+                    setFormData(defaultFaq);
+               }
           } catch (error) {
                console.error(error);
                setFormData(defaultFaq);
@@ -157,25 +155,34 @@ export default function FaqManager() {
           }
      };
 
-     const handleFaqChange = (index, field, value) => {
-          setFormData((prev) => {
-               const updatedFaq = [...prev.faq];
-               updatedFaq[index] = {
-                    ...updatedFaq[index],
-                    [field]: value,
-               };
-               return {
-                    ...prev,
-                    faq: updatedFaq,
-               };
-          });
-     };
+     useEffect(() => {
+          if (selectedPage?.slug) {
+               fetchFaqs(selectedPage.slug);
+          }
+     }, [selectedPage]);
 
      const handleAddFaq = () => {
           setFormData((prev) => ({
                ...prev,
-               faq: [...prev.faq, emptyFaq],
+               faq: [
+                    ...(prev.faq || []),
+                    { ques: "New Question Title", ans: "Detailed answer explanation text here." },
+               ],
           }));
+     };
+
+     const handleChangeFaq = (index, field, value) => {
+          setFormData((prev) => {
+               const updated = [...(prev.faq || [])];
+               updated[index] = {
+                    ...updated[index],
+                    [field]: value,
+               };
+               return {
+                    ...prev,
+                    faq: updated,
+               };
+          });
      };
 
      const handleDeleteFaq = (index) => {
@@ -235,7 +242,7 @@ export default function FaqManager() {
                          <button
                               onClick={handleSave}
                               disabled={saving}
-                              className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-orange-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer disabled:cursor-not-allowed shrink-0"
+                              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer disabled:cursor-not-allowed shrink-0"
                          >
                               <HiOutlineSave className="w-4 h-4" />
                               <span>{saving ? 'Saving...' : 'Save Changes'}</span>
@@ -274,11 +281,11 @@ export default function FaqManager() {
                                                        setOpenDropdown(false);
                                                   }}
                                                   className={`w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left border-b border-gray-100 last:border-none hover:bg-gray-50 transition-colors cursor-pointer ${
-                                                       active ? 'bg-orange-50/50' : ''
+                                                       active ? 'bg-primary/10' : ''
                                                   }`}
                                              >
                                                   <div>
-                                                       <p className={`text-sm font-semibold ${active ? 'text-orange-600' : 'text-gray-800'}`}>
+                                                       <p className={`text-sm font-semibold ${active ? 'text-primary' : 'text-gray-800'}`}>
                                                             {page.title}
                                                        </p>
                                                        <p className="text-xs text-gray-400 font-mono mt-0.5">
@@ -286,7 +293,7 @@ export default function FaqManager() {
                                                        </p>
                                                   </div>
                                                   {active && (
-                                                       <div className="w-2 h-2 rounded-full bg-orange-500" />
+                                                       <div className="w-2 h-2 rounded-full bg-primary" />
                                                   )}
                                              </button>
                                         );
@@ -298,7 +305,7 @@ export default function FaqManager() {
                     {/* Main Content Area */}
                     {loading ? (
                          <div className="h-64 rounded-2xl border border-gray-200 bg-white flex flex-col items-center justify-center text-gray-400 shadow-sm">
-                              <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
                               <span className="text-sm font-medium">Loading FAQ Data...</span>
                          </div>
                     ) : (
@@ -313,7 +320,7 @@ export default function FaqManager() {
                                              value={formData.title || ""}
                                              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                                              placeholder="e.g. FAQ"
-                                             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 font-sans"
+                                             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-sans"
                                         />
                                    </div>
                               </div>
@@ -326,7 +333,7 @@ export default function FaqManager() {
                                                   <h2 className="text-base font-bold text-gray-900">
                                                        FAQ Questions
                                                   </h2>
-                                                  <span className="px-2.5 py-0.5 rounded-full bg-orange-50 border border-orange-100 text-orange-600 text-xs font-semibold">
+                                                  <span className="px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
                                                        {totalFaqs} Questions
                                                   </span>
                                              </div>

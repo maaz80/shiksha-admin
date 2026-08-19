@@ -14,14 +14,18 @@ import {
      HiOutlineLogout,
      HiMenu,
      HiX,
-     HiOutlineMenu
+     HiOutlineMenu,
+     HiOutlineChatAlt2,
+     HiOutlineLockOpen
 } from "react-icons/hi";
 
 const navigationItems = [
      { name: "Overview", path: "/", icon: HiOutlineHome },
+     { name: "Course Unlock", path: "/user-access", icon: HiOutlineLockOpen },
      { name: "Courses", path: "/courses", icon: HiOutlineAcademicCap },
      { name: "Blogs", path: "/blogs", icon: HiOutlineBookOpen },
      { name: "Locations", path: "/location", icon: HiOutlineLocationMarker },
+     { name: "Testimonials", path: "/testimonials", icon: HiOutlineChatAlt2 },
      { name: "FAQ Manager", path: "/faq", icon: HiOutlineQuestionMarkCircle },
      { name: "Companies Worked", path: "/companies-worked", icon: HiOutlineBriefcase },
      { name: "Home Content", path: "/home-data", icon: HiOutlineDatabase },
@@ -32,6 +36,7 @@ const navigationItems = [
      { name: "Legal Settings", path: "/policy-settings", icon: HiOutlineLink },
      { name: "Contact Settings", path: "/contact-settings", icon: HiOutlineLink },
 ];
+
 
 export default function AdminLayout({ children }) {
      const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -65,11 +70,11 @@ export default function AdminLayout({ children }) {
                          {/* Brand Logo Header */}
                          <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100 shrink-0">
                               <Link to="/" className="flex items-center gap-2.5">
-                                   <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-orange-100">
+                                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg shadow-md shadow-primary/20">
                                         S
                                    </div>
                                    <span className="text-gray-900 font-bold text-lg tracking-tight">
-                                        Shiksha<span className="text-orange-500 font-semibold">Admin</span>
+                                        Shiksha<span className="text-primary font-semibold">Admin</span>
                                    </span>
                               </Link>
                               <button
@@ -95,11 +100,11 @@ export default function AdminLayout({ children }) {
                                              to={item.path}
                                              onClick={() => setSidebarOpen(false)}
                                              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${isActive
-                                                       ? "bg-orange-50 text-orange-600 shadow-sm shadow-orange-50/50"
+                                                       ? "bg-primary/10 text-primary font-bold shadow-xs"
                                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                                   }`}
                                         >
-                                             <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-orange-500" : "text-gray-400 group-hover:text-gray-600"}`} />
+                                             <Icon className={`w-5 h-5 shrink-0 ${isActive ? "text-primary" : "text-gray-400 group-hover:text-gray-600"}`} />
                                              <span>{item.name}</span>
                                         </Link>
                                    );
@@ -111,7 +116,7 @@ export default function AdminLayout({ children }) {
                     <div className="p-4 border-t border-gray-100 bg-gray-50/40 shrink-0">
                          <div className="flex items-center justify-between gap-3 mb-3">
                               <div className="flex items-center gap-2.5 min-w-0">
-                                   <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-semibold text-sm shrink-0 border border-orange-200">
+                                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 border border-primary/20">
                                         A
                                    </div>
                                    <div className="min-w-0">
