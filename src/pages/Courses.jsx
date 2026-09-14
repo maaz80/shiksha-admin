@@ -45,6 +45,62 @@ export default function Courses() {
      const [brochurePhones, setBrochurePhones] = useState("");
      const [brochureLink, setBrochureLink] = useState("");
 
+     // 14 Dynamic Course Details Sections States
+     const [socialProof, setSocialProof] = useState([]);
+
+     const [whyChooseUsTitle, setWhyChooseUsTitle] = useState("");
+     const [whyChooseUsSubtitle, setWhyChooseUsSubtitle] = useState("");
+     const [whyChooseUsItems, setWhyChooseUsItems] = useState([]);
+
+     const [chooseLearningTitle, setChooseLearningTitle] = useState("");
+     const [chooseLearningSubtitle, setChooseLearningSubtitle] = useState("");
+     const [emiTitle, setEmiTitle] = useState("");
+     const [emiSubtitle, setEmiSubtitle] = useState("");
+     const [emiPoints, setEmiPoints] = useState([]);
+     const [scholarshipTitle, setScholarshipTitle] = useState("");
+     const [scholarshipSubtitle, setScholarshipSubtitle] = useState("");
+     const [scholarshipPoints, setScholarshipPoints] = useState([]);
+     const [batchesTitle, setBatchesTitle] = useState("");
+     const [batchesSubtitle, setBatchesSubtitle] = useState("");
+     const [batchItems, setBatchItems] = useState([]);
+
+     const [benefitsTag, setBenefitsTag] = useState("");
+     const [benefitsTitle, setBenefitsTitle] = useState("");
+     const [benefitsSubtitle, setBenefitsSubtitle] = useState("");
+     const [benefitsCards, setBenefitsCards] = useState([]);
+
+     const [skillsYouWillLearnTitle, setSkillsYouWillLearnTitle] = useState("");
+     const [skillsYouWillLearnItems, setSkillsYouWillLearnItems] = useState([]);
+
+     const [whoShouldEnrollTitle, setWhoShouldEnrollTitle] = useState("");
+     const [whoShouldEnrollSubtitle, setWhoShouldEnrollSubtitle] = useState("");
+     const [whoShouldEnrollItems, setWhoShouldEnrollItems] = useState([]);
+
+     const [jobRolesTag, setJobRolesTag] = useState("");
+     const [jobRolesTitle, setJobRolesTitle] = useState("");
+     const [jobRolesDescription, setJobRolesDescription] = useState("");
+     const [jobRolesItems, setJobRolesItems] = useState([]);
+
+     const [hiringPartnersTitle, setHiringPartnersTitle] = useState("");
+     const [hiringPartnersSubtitle, setHiringPartnersSubtitle] = useState("");
+     const [hiringPartnersItems, setHiringPartnersItems] = useState([]);
+
+     const [trainersTitle, setTrainersTitle] = useState("");
+     const [trainersSubtitle, setTrainersSubtitle] = useState("");
+     const [trainersItems, setTrainersItems] = useState([]);
+
+     const [certificationTitle, setCertificationTitle] = useState("");
+     const [certificationSubtitle, setCertificationSubtitle] = useState("");
+     const [certificationBullets, setCertificationBullets] = useState([]);
+     const [certificationImage, setCertificationImage] = useState(null);
+
+     const [readyToStartTitle, setReadyToStartTitle] = useState("");
+     const [readyToStartSubtitle, setReadyToStartSubtitle] = useState("");
+     const [readyToStartBtn1Text, setReadyToStartBtn1Text] = useState("");
+     const [readyToStartBtn1Link, setReadyToStartBtn1Link] = useState("");
+     const [readyToStartBtn2Text, setReadyToStartBtn2Text] = useState("");
+     const [readyToStartBtn2Link, setReadyToStartBtn2Link] = useState("");
+
      // Chapter States
      const [chapters, setChapters] = useState([]);
      const [faqTitle, setFaqTitle] = useState("");
@@ -73,6 +129,155 @@ export default function Courses() {
      // Course Videos Section States
      const [videos, setVideos] = useState([]);
      const [showVideoModal, setShowVideoModal] = useState(false);
+
+     // Zoom Meeting Modal & Dispatch States
+     const [showMeetModal, setShowMeetModal] = useState(false);
+     const [selectedCourseForMeet, setSelectedCourseForMeet] = useState(null);
+     const [meetUrl, setMeetUrl] = useState("");
+     const [zoomMeetingId, setZoomMeetingId] = useState("");
+     const [zoomPasscode, setZoomPasscode] = useState("");
+     const [meetTitle, setMeetTitle] = useState("");
+     const [scheduledAt, setScheduledAt] = useState("Live Now");
+     const [instructions, setInstructions] = useState("");
+     const [generatingZoomApi, setGeneratingZoomApi] = useState(false);
+     const [sendingMeetEmail, setSendingMeetEmail] = useState(false);
+     const [endingMeetId, setEndingMeetId] = useState(null);
+
+     const openMeetModal = (course = null) => {
+          setSelectedCourseForMeet(course);
+          if (course && course.liveClass) {
+               setMeetUrl(course.liveClass.meetUrl || "");
+               setZoomMeetingId(course.liveClass.zoomMeetingId || "");
+               setZoomPasscode(course.liveClass.passcode || "");
+               setMeetTitle(course.liveClass.title || `Live Session: ${course.title || "UI/UX Class"}`);
+               setScheduledAt(course.liveClass.scheduledAt || "Live Now");
+               setInstructions(course.liveClass.instructions || "");
+          } else {
+               setMeetUrl("");
+               setZoomMeetingId("");
+               setZoomPasscode("");
+               setMeetTitle(course ? `Live Session: ${course.title}` : "Live Session for All Courses");
+               setScheduledAt("Live Now");
+               setInstructions("");
+          }
+          setShowMeetModal(true);
+     };
+
+     const handleMeetUrlChange = (val) => {
+          setMeetUrl(val);
+          if (val && val.includes("zoom.us")) {
+               const idMatch = val.match(/\/(?:j|wc\/join)\/(\d+)/);
+               const pwdMatch = val.match(/pwd=([^&]+)/);
+               if (idMatch && idMatch[1]) setZoomMeetingId(idMatch[1]);
+               if (pwdMatch && pwdMatch[1]) setZoomPasscode(pwdMatch[1]);
+          }
+     };
+
+     const handleAutoGenerateZoomLink = async () => {
+          setGeneratingZoomApi(true);
+          try {
+               const res = await fetch(`${API_URL}/admin/create-zoom-meeting`, {
+                    method: "POST",
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": `Bearer ${getAdminToken()}`
+                    },
+                    body: JSON.stringify({ topic: meetTitle || "Live Interactive Class" })
+               });
+               const data = await res.json();
+               if (data.success && data.meetUrl) {
+                    setMeetUrl(data.meetUrl);
+                    if (data.zoomMeetingId) setZoomMeetingId(data.zoomMeetingId);
+                    if (data.passcode) setZoomPasscode(data.passcode);
+                    showToast("⚡ Real Zoom meeting generated via Zoom API!", "success");
+               } else {
+                    showToast(data.message || "Paste real Zoom link below.", "info");
+               }
+          } catch (err) {
+               showToast("Failed to connect to Zoom API.", "error");
+          } finally {
+               setGeneratingZoomApi(false);
+          }
+     };
+
+     const resetMeetForm = () => {
+          setMeetUrl("");
+          setZoomMeetingId("");
+          setZoomPasscode("");
+          setMeetTitle("");
+          setScheduledAt("Live Now");
+          setInstructions("");
+          setSelectedCourseForMeet(null);
+     };
+
+     const handleSendMeetLink = async () => {
+          if (!meetUrl) return showToast("Please enter or generate a valid Zoom meeting link.", "error");
+
+          setSendingMeetEmail(true);
+          try {
+               const res = await fetch(`${API_URL}/admin/dispatch-live-meet`, {
+                    method: "POST",
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": `Bearer ${getAdminToken()}`
+                    },
+                    body: JSON.stringify({
+                         courseId: selectedCourseForMeet?._id || "ALL",
+                         courseSlug: selectedCourseForMeet?.slug || "",
+                         courseTitle: selectedCourseForMeet?.title || "Selected Courses",
+                         meetUrl,
+                         zoomMeetingId,
+                         passcode: zoomPasscode,
+                         title: meetTitle,
+                         scheduledAt,
+                         instructions,
+                         saveToCourse: true
+                    })
+               });
+               const data = await res.json();
+               if (res.ok && data.success) {
+                    showToast(data.message || "Zoom link dispatched to students!", "success");
+                    resetMeetForm();
+                    setShowMeetModal(false);
+                    fetchCourses();
+               } else {
+                    showToast(data.error || "Failed to dispatch Zoom link.", "error");
+               }
+          } catch (err) {
+               showToast("Failed to send Zoom meeting emails.", "error");
+          } finally {
+               setSendingMeetEmail(false);
+          }
+     };
+
+     const handleEndMeetLink = async (course = null) => {
+          const cId = course?._id || "ALL";
+          setEndingMeetId(cId);
+          try {
+               const res = await fetch(`${API_URL}/admin/end-live-meet`, {
+                    method: "POST",
+                    headers: {
+                         "Content-Type": "application/json",
+                         "Authorization": `Bearer ${getAdminToken()}`
+                    },
+                    body: JSON.stringify({
+                         courseId: cId,
+                         courseSlug: course?.slug || ""
+                    })
+               });
+               const data = await res.json();
+               if (res.ok) {
+                    showToast(data.message || "Live Zoom session ended.", "success");
+                    fetchCourses();
+               } else {
+                    showToast(data.error || "Failed to end live session.", "error");
+               }
+          } catch (err) {
+               showToast("Failed to connect to backend server.", "error");
+          } finally {
+               setEndingMeetId(null);
+          }
+     };
 
      const addVideoItem = () => {
           setVideos(prev => [...prev, { video: "", alt: "", title: "", thumbnail: "", uploading: false, progress: 0, uploadError: "" }]);
@@ -244,6 +449,64 @@ export default function Courses() {
           }
      };
 
+     // Handlers for Social Proof
+     const addSocialProofItem = () => setSocialProof(prev => [...prev, { value: "", name: "" }]);
+     const removeSocialProofItem = (idx) => setSocialProof(prev => prev.filter((_, i) => i !== idx));
+     const updateSocialProofItemField = (idx, key, value) => setSocialProof(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Why Choose Us
+     const addWhyChooseUsItem = () => setWhyChooseUsItems(prev => [...prev, { title: "", description: "", iconName: "graduationCap" }]);
+     const removeWhyChooseUsItem = (idx) => setWhyChooseUsItems(prev => prev.filter((_, i) => i !== idx));
+     const updateWhyChooseUsItemField = (idx, key, value) => setWhyChooseUsItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Choose Your Learning
+     const addEmiPoint = () => setEmiPoints(prev => [...prev, ""]);
+     const removeEmiPoint = (idx) => setEmiPoints(prev => prev.filter((_, i) => i !== idx));
+     const updateEmiPoint = (idx, value) => setEmiPoints(prev => prev.map((pt, i) => i === idx ? value : pt));
+
+     const addScholarshipPoint = () => setScholarshipPoints(prev => [...prev, ""]);
+     const removeScholarshipPoint = (idx) => setScholarshipPoints(prev => prev.filter((_, i) => i !== idx));
+     const updateScholarshipPoint = (idx, value) => setScholarshipPoints(prev => prev.map((pt, i) => i === idx ? value : pt));
+
+     const addBatchItem = () => setBatchItems(prev => [...prev, { dayDate: "01", month: "JUN", title: "Weekend Batch", time: "Sat - Sun • 10:00 AM", status: "Upcoming" }]);
+     const removeBatchItem = (idx) => setBatchItems(prev => prev.filter((_, i) => i !== idx));
+     const updateBatchItemField = (idx, key, value) => setBatchItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Course Benefits
+     const addBenefitCard = () => setBenefitsCards(prev => [...prev, { title: "", description: "", iconName: "TrendingUp" }]);
+     const removeBenefitCard = (idx) => setBenefitsCards(prev => prev.filter((_, i) => i !== idx));
+     const updateBenefitCardField = (idx, key, value) => setBenefitsCards(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Skills You Will Learn
+     const addSkillItem = () => setSkillsYouWillLearnItems(prev => [...prev, ""]);
+     const removeSkillItem = (idx) => setSkillsYouWillLearnItems(prev => prev.filter((_, i) => i !== idx));
+     const updateSkillItemField = (idx, value) => setSkillsYouWillLearnItems(prev => prev.map((item, i) => i === idx ? value : item));
+
+     // Handlers for Who Should Enroll
+     const addWhoShouldEnrollItem = () => setWhoShouldEnrollItems(prev => [...prev, { title: "", description: "", iconName: "briefcase" }]);
+     const removeWhoShouldEnrollItem = (idx) => setWhoShouldEnrollItems(prev => prev.filter((_, i) => i !== idx));
+     const updateWhoShouldEnrollItemField = (idx, key, value) => setWhoShouldEnrollItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Job Roles
+     const addJobRoleItem = () => setJobRolesItems(prev => [...prev, { step: "01", title: "", description: "", keyFocusTitle: "KEY FOCUS AREAS", keyFocus: "", iconName: "briefcase" }]);
+     const removeJobRoleItem = (idx) => setJobRolesItems(prev => prev.filter((_, i) => i !== idx));
+     const updateJobRoleItemField = (idx, key, value) => setJobRolesItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Hiring Partners
+     const addHiringPartnerItem = () => setHiringPartnersItems(prev => [...prev, { name: "", image: "" }]);
+     const removeHiringPartnerItem = (idx) => setHiringPartnersItems(prev => prev.filter((_, i) => i !== idx));
+     const updateHiringPartnerItemField = (idx, key, value) => setHiringPartnersItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Meet The Trainer
+     const addTrainerItem = () => setTrainersItems(prev => [...prev, { name: "", role: "", bio: "", rating: "4.9/5", students: "400+ Students", image: "", linkedin: "" }]);
+     const removeTrainerItem = (idx) => setTrainersItems(prev => prev.filter((_, i) => i !== idx));
+     const updateTrainerItemField = (idx, key, value) => setTrainersItems(prev => prev.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+
+     // Handlers for Certification Bullets
+     const addCertificationBullet = () => setCertificationBullets(prev => [...prev, ""]);
+     const removeCertificationBullet = (idx) => setCertificationBullets(prev => prev.filter((_, i) => i !== idx));
+     const updateCertificationBullet = (idx, value) => setCertificationBullets(prev => prev.map((item, i) => i === idx ? value : item));
+
      const resetForm = () => {
           setTitle("");
           setAlt("");
@@ -277,6 +540,51 @@ export default function Courses() {
           setShowVideoModal(false);
           setEditIndex(null);
           setEditItem(null);
+
+          setSocialProof([]);
+          setWhyChooseUsTitle("");
+          setWhyChooseUsSubtitle("");
+          setWhyChooseUsItems([]);
+          setChooseLearningTitle("");
+          setChooseLearningSubtitle("");
+          setEmiTitle("");
+          setEmiSubtitle("");
+          setEmiPoints([]);
+          setScholarshipTitle("");
+          setScholarshipSubtitle("");
+          setScholarshipPoints([]);
+          setBatchesTitle("");
+          setBatchesSubtitle("");
+          setBatchItems([]);
+          setBenefitsTag("");
+          setBenefitsTitle("");
+          setBenefitsSubtitle("");
+          setBenefitsCards([]);
+          setSkillsYouWillLearnTitle("");
+          setSkillsYouWillLearnItems([]);
+          setWhoShouldEnrollTitle("");
+          setWhoShouldEnrollSubtitle("");
+          setWhoShouldEnrollItems([]);
+          setJobRolesTag("");
+          setJobRolesTitle("");
+          setJobRolesDescription("");
+          setJobRolesItems([]);
+          setHiringPartnersTitle("");
+          setHiringPartnersSubtitle("");
+          setHiringPartnersItems([]);
+          setTrainersTitle("");
+          setTrainersSubtitle("");
+          setTrainersItems([]);
+          setCertificationTitle("");
+          setCertificationSubtitle("");
+          setCertificationBullets([]);
+          setCertificationImage(null);
+          setReadyToStartTitle("");
+          setReadyToStartSubtitle("");
+          setReadyToStartBtn1Text("");
+          setReadyToStartBtn1Link("");
+          setReadyToStartBtn2Text("");
+          setReadyToStartBtn2Link("");
      };
 
      const openUpload = () => {
@@ -310,6 +618,60 @@ export default function Courses() {
           setShortTermItems(course.shortTerm?.items || []);
           setSchemas(course.schemas || []);
           setVideos(course.videos || []);
+
+          setSocialProof(Array.isArray(course.socialProof) ? course.socialProof : []);
+          setWhyChooseUsTitle(course.whyChooseUs?.title || "");
+          setWhyChooseUsSubtitle(course.whyChooseUs?.subtitle || "");
+          setWhyChooseUsItems(Array.isArray(course.whyChooseUs?.items) ? course.whyChooseUs.items : []);
+
+          setChooseLearningTitle(course.chooseLearning?.title || "");
+          setChooseLearningSubtitle(course.chooseLearning?.subtitle || "");
+          setEmiTitle(course.chooseLearning?.emi?.title || "");
+          setEmiSubtitle(course.chooseLearning?.emi?.subtitle || "");
+          setEmiPoints(Array.isArray(course.chooseLearning?.emi?.points) ? course.chooseLearning.emi.points : []);
+          setScholarshipTitle(course.chooseLearning?.scholarship?.title || "");
+          setScholarshipSubtitle(course.chooseLearning?.scholarship?.subtitle || "");
+          setScholarshipPoints(Array.isArray(course.chooseLearning?.scholarship?.points) ? course.chooseLearning.scholarship.points : []);
+          setBatchesTitle(course.chooseLearning?.batches?.title || "");
+          setBatchesSubtitle(course.chooseLearning?.batches?.subtitle || "");
+          setBatchItems(Array.isArray(course.chooseLearning?.batches?.items) ? course.chooseLearning.batches.items : []);
+
+          setBenefitsTag(course.benefitsTag || "");
+          setBenefitsTitle(course.benefitsTitle || "");
+          setBenefitsSubtitle(course.benefitsSubtitle || "");
+          setBenefitsCards(Array.isArray(course.benefitsCards) ? course.benefitsCards : []);
+
+          setSkillsYouWillLearnTitle(course.skillsYouWillLearn?.title || "");
+          setSkillsYouWillLearnItems(Array.isArray(course.skillsYouWillLearn?.skills) ? course.skillsYouWillLearn.skills : []);
+
+          setWhoShouldEnrollTitle(course.whoShouldEnroll?.title || "");
+          setWhoShouldEnrollSubtitle(course.whoShouldEnroll?.subtitle || "");
+          setWhoShouldEnrollItems(Array.isArray(course.whoShouldEnroll?.items) ? course.whoShouldEnroll.items : []);
+
+          setJobRolesTag(course.jobRoles?.tag || "");
+          setJobRolesTitle(course.jobRoles?.title || "");
+          setJobRolesDescription(course.jobRoles?.description || "");
+          setJobRolesItems(Array.isArray(course.jobRoles?.items) ? course.jobRoles.items : []);
+
+          setHiringPartnersTitle(course.hiringPartners?.title || "");
+          setHiringPartnersSubtitle(course.hiringPartners?.subtitle || "");
+          setHiringPartnersItems(Array.isArray(course.hiringPartners?.items) ? course.hiringPartners.items : []);
+
+          setTrainersTitle(course.trainers?.title || "");
+          setTrainersSubtitle(course.trainers?.subtitle || "");
+          setTrainersItems(Array.isArray(course.trainers?.items) ? course.trainers.items : []);
+
+          setCertificationTitle(course.certificationTitle || "");
+          setCertificationSubtitle(course.certificationSubtitle || "");
+          setCertificationBullets(Array.isArray(course.certificationBullets) ? course.certificationBullets : []);
+          setCertificationImage(course.certificationImage || null);
+
+          setReadyToStartTitle(course.readyToStartJourney?.title || "");
+          setReadyToStartSubtitle(course.readyToStartJourney?.subtitle || "");
+          setReadyToStartBtn1Text(course.readyToStartJourney?.button1Text || "");
+          setReadyToStartBtn1Link(course.readyToStartJourney?.button1Link || "");
+          setReadyToStartBtn2Text(course.readyToStartJourney?.button2Text || "");
+          setReadyToStartBtn2Link(course.readyToStartJourney?.button2Link || "");
 
           if (course.chapter) {
                if (Array.isArray(course.chapter)) {
@@ -469,6 +831,94 @@ export default function Courses() {
                formData.append("brochurePhones", brochurePhones);
                formData.append("brochureLink", brochureLink);
 
+               // Append 14 Dynamic Course Details Sections
+               formData.append("socialProof", JSON.stringify(socialProof));
+               formData.append("whyChooseUs", JSON.stringify({
+                    title: whyChooseUsTitle,
+                    subtitle: whyChooseUsSubtitle,
+                    items: whyChooseUsItems
+               }));
+               formData.append("chooseLearning", JSON.stringify({
+                    title: chooseLearningTitle,
+                    subtitle: chooseLearningSubtitle,
+                    emi: { title: emiTitle, subtitle: emiSubtitle, points: emiPoints },
+                    scholarship: { title: scholarshipTitle, subtitle: scholarshipSubtitle, points: scholarshipPoints },
+                    batches: { title: batchesTitle, subtitle: batchesSubtitle, items: batchItems }
+               }));
+               formData.append("benefitsTag", benefitsTag);
+               formData.append("benefitsTitle", benefitsTitle);
+               formData.append("benefitsSubtitle", benefitsSubtitle);
+               formData.append("benefitsCards", JSON.stringify(benefitsCards));
+
+               formData.append("skillsYouWillLearn", JSON.stringify({
+                    title: skillsYouWillLearnTitle,
+                    skills: skillsYouWillLearnItems
+               }));
+               formData.append("whoShouldEnroll", JSON.stringify({
+                    title: whoShouldEnrollTitle,
+                    subtitle: whoShouldEnrollSubtitle,
+                    items: whoShouldEnrollItems
+               }));
+               formData.append("jobRoles", JSON.stringify({
+                    tag: jobRolesTag,
+                    title: jobRolesTitle,
+                    description: jobRolesDescription,
+                    items: jobRolesItems
+               }));
+
+               const formattedHiringPartners = hiringPartnersItems.map(item => ({
+                    name: item.name || "",
+                    image: (item.image && item.image instanceof File) ? "" : (item.image || "")
+               }));
+               formData.append("hiringPartners", JSON.stringify({
+                    title: hiringPartnersTitle,
+                    subtitle: hiringPartnersSubtitle,
+                    items: formattedHiringPartners
+               }));
+               hiringPartnersItems.forEach((item, idx) => {
+                    if (item.image && item.image instanceof File) {
+                         formData.append(`hiringPartner_${idx}`, item.image);
+                    }
+               });
+
+               const formattedTrainers = trainersItems.map(item => ({
+                    name: item.name || "",
+                    role: item.role || "",
+                    bio: item.bio || "",
+                    rating: item.rating || "4.9/5",
+                    students: item.students || "",
+                    linkedin: item.linkedin || "",
+                    image: (item.image && item.image instanceof File) ? "" : (item.image || "")
+               }));
+               formData.append("trainers", JSON.stringify({
+                    title: trainersTitle,
+                    subtitle: trainersSubtitle,
+                    items: formattedTrainers
+               }));
+               trainersItems.forEach((item, idx) => {
+                    if (item.image && item.image instanceof File) {
+                         formData.append(`trainer_${idx}`, item.image);
+                    }
+               });
+
+               formData.append("certificationTitle", certificationTitle);
+               formData.append("certificationSubtitle", certificationSubtitle);
+               formData.append("certificationBullets", JSON.stringify(certificationBullets));
+               if (certificationImage && certificationImage instanceof File) {
+                    formData.append("certificationImage", certificationImage);
+               } else if (typeof certificationImage === "string") {
+                    formData.append("certificationImage", certificationImage);
+               }
+
+               formData.append("readyToStartJourney", JSON.stringify({
+                    title: readyToStartTitle,
+                    subtitle: readyToStartSubtitle,
+                    button1Text: readyToStartBtn1Text,
+                    button1Link: readyToStartBtn1Link,
+                    button2Text: readyToStartBtn2Text,
+                    button2Link: readyToStartBtn2Link
+               }));
+
                const formattedSections = chapters.map(ch => ({
                     title: ch.chaptername,
                     chaptername: ch.chaptername,
@@ -609,94 +1059,139 @@ export default function Courses() {
                          <p className="text-sm text-gray-500 mt-1">Manage single-document courses and layout metadata.</p>
                     </div>
 
-                    <button
-                         onClick={openUpload}
-                         className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
-                    >
-                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                         </svg>
-                         Add Course
-                    </button>
-               </div>
+                     <div className="flex items-center gap-3 shrink-0">
+                          <button
+                               type="button"
+                               onClick={() => openMeetModal(null)}
+                               className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-blue-200 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                          >
+                               Zoom Live Class
+                          </button>
+                          <button
+                               onClick={openUpload}
+                               className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                          >
+                               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                               </svg>
+                               Add Course
+                          </button>
+                     </div>
+                </div>
 
-               <div className="flex border-b border-gray-200 mb-8 max-w-7xl mx-auto px-6 lg:px-10">
-                    <button
-                         onClick={() => setActiveTab("list")}
-                         className={`pb-4 px-4 text-sm font-semibold transition-all cursor-pointer ${activeTab === "list"
-                                   ? "border-b-2 border-primary text-primary"
-                                   : "text-gray-400 hover:text-gray-600"
-                              }`}
-                    >
-                         Courses List
-                    </button>
-                    <button
-                         onClick={() => setActiveTab("config")}
-                         className={`pb-4 px-4 text-sm font-semibold transition-all cursor-pointer ${activeTab === "config"
-                                   ? "border-b-2 border-primary text-primary"
-                                   : "text-gray-400 hover:text-gray-600"
-                              }`}
-                    >
-                         Page & Layout Config
-                    </button>
-               </div>
+                <div className="flex border-b border-gray-200 mb-8 max-w-7xl mx-auto px-6 lg:px-10">
+                     <button
+                          onClick={() => setActiveTab("list")}
+                          className={`pb-4 px-4 text-sm font-semibold transition-all cursor-pointer ${activeTab === "list"
+                                    ? "border-b-2 border-primary text-primary"
+                                    : "text-gray-400 hover:text-gray-600"
+                               }`}
+                     >
+                          Courses List
+                     </button>
+                     <button
+                          onClick={() => setActiveTab("config")}
+                          className={`pb-4 px-4 text-sm font-semibold transition-all cursor-pointer ${activeTab === "config"
+                                    ? "border-b-2 border-primary text-primary"
+                                    : "text-gray-400 hover:text-gray-600"
+                               }`}
+                     >
+                          Page & Layout Config
+                     </button>
+                </div>
 
-               {/* TAB CONTENTS */}
-               <div className="max-w-7xl mx-auto px-6 lg:px-10">
-                    {activeTab === "list" ? (
-                         /* COURSE LIST TAB */
-                         courses.length === 0 ? (
-                              <div className="flex flex-col items-center justify-center py-32 bg-white border border-gray-200 rounded-2xl text-center shadow-sm">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                                   </svg>
-                                   <p className="text-lg font-semibold text-gray-800">No courses yet</p>
-                                   <p className="text-sm text-gray-450 mt-1">Click "Add Course" above to write your first program</p>
-                              </div>
-                         ) : (
-                              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                                   {courses.map((course, index) => (
-                                        <div key={course._id || index} className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
-                                             <div className="relative overflow-hidden aspect-16/10">
-                                                  <img
-                                                       src={course.image || "/images/shiksha-design-hero.webp"}
-                                                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-350"
-                                                       alt={course.title}
-                                                  />
-                                                  {course.category && (
-                                                       <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-orange-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-orange-100 uppercase tracking-wider shadow-sm">
-                                                            {course.category}
-                                                       </span>
-                                                  )}
-                                             </div>
+                {/* TAB CONTENTS */}
+                <div className="max-w-7xl mx-auto px-6 lg:px-10">
+                     {activeTab === "list" ? (
+                          /* COURSE LIST TAB */
+                          courses.length === 0 ? (
+                               <div className="flex flex-col items-center justify-center py-32 bg-white border border-gray-200 rounded-2xl text-center shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                                    </svg>
+                                    <p className="text-lg font-semibold text-gray-800">No courses yet</p>
+                                    <p className="text-sm text-gray-450 mt-1">Click "Add Course" above to write your first program</p>
+                               </div>
+                          ) : (
+                               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                                    {courses.map((course, index) => (
+                                         <div key={course._id || index} className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+                                              <div className="relative overflow-hidden aspect-16/10">
+                                                   <img
+                                                        src={course.image || "/images/shiksha-design-hero.webp"}
+                                                        className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-350"
+                                                        alt={course.title}
+                                                   />
+                                                   {course.category && (
+                                                        <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-orange-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-orange-100 uppercase tracking-wider shadow-sm">
+                                                             {course.category}
+                                                        </span>
+                                                   )}
+                                                   {course.liveClass?.active && (
+                                                        <span className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md animate-pulse flex items-center gap-1">
+                                                             <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                                                             Live Active
+                                                        </span>
+                                                   )}
+                                              </div>
 
-                                             <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                                                  <div className="space-y-2">
-                                                       <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2" title={course.title}>
-                                                            {course.title}
-                                                       </h2>
-                                                       <p className="text-xs text-gray-400 line-clamp-3 leading-normal">
-                                                            {course.overview}
-                                                       </p>
-                                                  </div>
+                                              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                                   <div className="space-y-2">
+                                                        <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2" title={course.title}>
+                                                             {course.title}
+                                                        </h2>
+                                                        <p className="text-xs text-gray-400 line-clamp-3 leading-normal">
+                                                             {course.overview}
+                                                        </p>
+                                                   </div>
 
-                                                  <div className="flex gap-2.5 pt-2">
-                                                       <button
-                                                            onClick={() => openEdit(course, index)}
-                                                            className="flex-1 flex items-center justify-center gap-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
-                                                       >
-                                                            Edit
-                                                       </button>
-                                                       <button
-                                                            onClick={() => deleteCourse(index)}
-                                                            className="flex-1 flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
-                                                       >
-                                                            Delete
-                                                       </button>
-                                                  </div>
-                                             </div>
-                                        </div>
-                                   ))}
+                                                   <div className="space-y-2 pt-2">
+                                                        {course.liveClass?.active ? (
+                                                             <div className="flex gap-2">
+                                                                  <button
+                                                                       type="button"
+                                                                       onClick={() => handleEndMeetLink(course)}
+                                                                       disabled={endingMeetId === course._id}
+                                                                       className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-xl transition cursor-pointer flex items-center justify-center gap-1"
+                                                                  >
+                                                                       {endingMeetId === course._id ? "Ending..." : "🔴 End Live Session"}
+                                                                  </button>
+                                                                  <button
+                                                                       type="button"
+                                                                       onClick={() => openMeetModal(course)}
+                                                                       className="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer"
+                                                                  >
+                                                                       Link
+                                                                  </button>
+                                                             </div>
+                                                        ) : (
+                                                             <button
+                                                                  type="button"
+                                                                  onClick={() => openMeetModal(course)}
+                                                                  className="w-full flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold py-2 rounded-xl transition-colors duration-200 cursor-pointer"
+                                                             >
+                                                                  Start Zoom Live Class
+                                                             </button>
+                                                        )}
+
+                                                        <div className="flex gap-2.5">
+                                                             <button
+                                                                  onClick={() => openEdit(course, index)}
+                                                                  className="flex-1 flex items-center justify-center gap-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
+                                                             >
+                                                                  Edit
+                                                             </button>
+                                                             <button
+                                                                  onClick={() => deleteCourse(index)}
+                                                                  className="flex-1 flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-xs font-bold py-2.5 rounded-xl transition-colors duration-200 cursor-pointer"
+                                                             >
+                                                                  Delete
+                                                             </button>
+                                                        </div>
+                                                   </div>
+                                              </div>
+                                         </div>
+                                    ))}
                               </div>
                          )
                     ) : (
@@ -1050,7 +1545,24 @@ export default function Courses() {
                                    </div>
 
                                    {/* Promo & Brochure Custom Fields */}
-                                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2 pt-2">Promo & Brochure Fields</p>
+                                   <div className="flex items-center justify-between border-b border-gray-100 pb-2 pt-2">
+                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Promo & Brochure Fields</p>
+                                        <CopySectionSelector
+                                             sectionName="Promo & Brochure"
+                                             courses={courses}
+                                             currentCourseId={editItem?._id}
+                                             showToast={showToast}
+                                             onCopy={(c) => {
+                                                  setPromoTitle(c.promoTitle || "");
+                                                  setPromoDescription(c.promoDescription || "");
+                                                  setPromoBenefits(c.promoBenefits || "");
+                                                  setPromoSocialBottomContent(c.promoSocialBottomContent || "");
+                                                  setBrochureTitle(c.brochureTitle || "");
+                                                  setBrochureSubtext(c.brochureSubtext || "");
+                                                  setBrochurePhones(c.brochurePhones || "");
+                                             }}
+                                        />
+                                   </div>
 
                                    <div className="grid grid-cols-1 gap-4">
                                         <div className="space-y-1.5">
@@ -1122,6 +1634,566 @@ export default function Courses() {
                                         </div>
                                    </div>
 
+                                   {/* 14 Dynamic Course Details Sections */}
+                                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2 pt-4">Course Page Dynamic Sections</p>
+
+                                   {/* 1. Social Proof Bar */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">1. Social Proof Bar Items ({socialProof.length})</p>
+                                             <div className="flex items-center gap-2">
+                                                  <CopySectionSelector
+                                                       sectionName="Social Proof"
+                                                       courses={courses}
+                                                       currentCourseId={editItem?._id}
+                                                       showToast={showToast}
+                                                       onCopy={(c) => {
+                                                            if (c.socialProof && Array.isArray(c.socialProof)) setSocialProof(JSON.parse(JSON.stringify(c.socialProof)));
+                                                       }}
+                                                  />
+                                                  <button
+                                                       type="button"
+                                                       onClick={addSocialProofItem}
+                                                       className="inline-flex items-center gap-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                                  >
+                                                       + Add Stat Item
+                                                  </button>
+                                             </div>
+                                        </div>
+                                        {socialProof.map((sp, idx) => (
+                                             <div key={idx} className="flex gap-2 items-center bg-white p-3 rounded-lg border border-gray-200">
+                                                  <input
+                                                       value={sp.value || ""}
+                                                       onChange={(e) => updateSocialProofItemField(idx, "value", e.target.value)}
+                                                       placeholder="Value (e.g. 4.8★)"
+                                                       className="w-1/3 h-9 px-3 border border-gray-300 rounded-lg text-xs"
+                                                  />
+                                                  <input
+                                                       value={sp.name || ""}
+                                                       onChange={(e) => updateSocialProofItemField(idx, "name", e.target.value)}
+                                                       placeholder="Label (e.g. Rating on Google)"
+                                                       className="flex-1 h-9 px-3 border border-gray-300 rounded-lg text-xs"
+                                                  />
+                                                  <button
+                                                       type="button"
+                                                       onClick={() => removeSocialProofItem(idx)}
+                                                       className="text-red-500 hover:text-red-600 p-1 cursor-pointer"
+                                                  >
+                                                       ✕
+                                                  </button>
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 2. Why Choose Us Section */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">2. Why Choose Us Section</p>
+                                             <CopySectionSelector
+                                                  sectionName="Why Choose Us"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.whyChooseUs) {
+                                                            setWhyChooseUsTitle(c.whyChooseUs.title || "");
+                                                            setWhyChooseUsSubtitle(c.whyChooseUs.subtitle || "");
+                                                            setWhyChooseUsItems(c.whyChooseUs.items ? JSON.parse(JSON.stringify(c.whyChooseUs.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <div className="space-y-1">
+                                                  <label className={labelClass}>Section Title</label>
+                                                  <input
+                                                       value={whyChooseUsTitle}
+                                                       onChange={(e) => setWhyChooseUsTitle(e.target.value)}
+                                                       placeholder="e.g. Why Choose Shiksha Tech"
+                                                       className={inputClass}
+                                                  />
+                                             </div>
+                                             <div className="space-y-1">
+                                                  <label className={labelClass}>Section Subtitle</label>
+                                                  <input
+                                                       value={whyChooseUsSubtitle}
+                                                       onChange={(e) => setWhyChooseUsSubtitle(e.target.value)}
+                                                       placeholder="e.g. Practical, industry-led learning"
+                                                       className={inputClass}
+                                                  />
+                                             </div>
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Feature Cards ({whyChooseUsItems.length})</span>
+                                             <button
+                                                  type="button"
+                                                  onClick={addWhyChooseUsItem}
+                                                  className="inline-flex items-center gap-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1 rounded-lg cursor-pointer"
+                                             >
+                                                  + Add Card
+                                             </button>
+                                        </div>
+                                        {whyChooseUsItems.map((item, idx) => (
+                                             <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                  <button
+                                                       type="button"
+                                                       onClick={() => removeWhyChooseUsItem(idx)}
+                                                       className="absolute top-2 right-2 text-xs text-red-500 hover:text-red-600 font-bold cursor-pointer"
+                                                  >
+                                                       ✕
+                                                  </button>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                       <input
+                                                            value={item.title || ""}
+                                                            onChange={(e) => updateWhyChooseUsItemField(idx, "title", e.target.value)}
+                                                            placeholder="Card Title"
+                                                            className="h-9 px-3 border border-gray-300 rounded-lg text-xs"
+                                                       />
+                                                       <input
+                                                            value={item.iconName || ""}
+                                                            onChange={(e) => updateWhyChooseUsItemField(idx, "iconName", e.target.value)}
+                                                            placeholder="Icon Name (e.g. graduationCap, bookOpen, award)"
+                                                            className="h-9 px-3 border border-gray-300 rounded-lg text-xs"
+                                                       />
+                                                  </div>
+                                                  <textarea
+                                                       value={item.description || ""}
+                                                       onChange={(e) => updateWhyChooseUsItemField(idx, "description", e.target.value)}
+                                                       placeholder="Card Description"
+                                                       rows={2}
+                                                       className="w-full p-2 border border-gray-300 rounded-lg text-xs"
+                                                  />
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 3. Choose Your Learning Section */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-4">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">3. Choose Your Learning (EMI, Scholarship, Batches)</p>
+                                             <CopySectionSelector
+                                                  sectionName="Choose Your Learning"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.chooseLearning) {
+                                                            setChooseLearningTitle(c.chooseLearning.title || "");
+                                                            setChooseLearningSubtitle(c.chooseLearning.subtitle || "");
+                                                            setEmiTitle(c.chooseLearning.emi?.title || "");
+                                                            setEmiSubtitle(c.chooseLearning.emi?.subtitle || "");
+                                                            setEmiPoints(c.chooseLearning.emi?.points ? [...c.chooseLearning.emi.points] : []);
+                                                            setScholarshipTitle(c.chooseLearning.scholarship?.title || "");
+                                                            setScholarshipSubtitle(c.chooseLearning.scholarship?.subtitle || "");
+                                                            setScholarshipPoints(c.chooseLearning.scholarship?.points ? [...c.chooseLearning.scholarship.points] : []);
+                                                            setBatchesTitle(c.chooseLearning.batches?.title || "");
+                                                            setBatchesSubtitle(c.chooseLearning.batches?.subtitle || "");
+                                                            setBatchItems(c.chooseLearning.batches?.items ? JSON.parse(JSON.stringify(c.chooseLearning.batches.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <div className="space-y-1">
+                                                  <label className={labelClass}>Main Title</label>
+                                                  <input
+                                                       value={chooseLearningTitle}
+                                                       onChange={(e) => setChooseLearningTitle(e.target.value)}
+                                                       placeholder="e.g. Choose Your Learning Plan"
+                                                       className={inputClass}
+                                                  />
+                                             </div>
+                                             <div className="space-y-1">
+                                                  <label className={labelClass}>Main Subtitle</label>
+                                                  <input
+                                                       value={chooseLearningSubtitle}
+                                                       onChange={(e) => setChooseLearningSubtitle(e.target.value)}
+                                                       placeholder="e.g. Flexible payment options for all"
+                                                       className={inputClass}
+                                                  />
+                                             </div>
+                                        </div>
+
+                                        {/* EMI Card */}
+                                        <div className="bg-white p-3.5 rounded-lg border border-gray-200 space-y-2">
+                                             <p className="text-xs font-bold text-orange-600 uppercase">No-Cost EMI Options</p>
+                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                  <input value={emiTitle} onChange={(e) => setEmiTitle(e.target.value)} placeholder="EMI Title" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  <input value={emiSubtitle} onChange={(e) => setEmiSubtitle(e.target.value)} placeholder="EMI Subtitle" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                             </div>
+                                             <div className="space-y-1.5 pt-1">
+                                                  <div className="flex items-center justify-between">
+                                                       <span className="text-[11px] text-gray-500 font-semibold">EMI Bullet Points</span>
+                                                       <button type="button" onClick={addEmiPoint} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Bullet</button>
+                                                  </div>
+                                                  {emiPoints.map((pt, idx) => (
+                                                       <div key={idx} className="flex gap-2 items-center">
+                                                            <input value={pt} onChange={(e) => updateEmiPoint(idx, e.target.value)} placeholder="Bullet point text" className="flex-1 h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <button type="button" onClick={() => removeEmiPoint(idx)} className="text-red-500 text-xs">✕</button>
+                                                       </div>
+                                                  ))}
+                                             </div>
+                                        </div>
+
+                                        {/* Scholarship Card */}
+                                        <div className="bg-white p-3.5 rounded-lg border border-gray-200 space-y-2">
+                                             <p className="text-xs font-bold text-emerald-600 uppercase">Scholarship Program</p>
+                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                  <input value={scholarshipTitle} onChange={(e) => setScholarshipTitle(e.target.value)} placeholder="Scholarship Title" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  <input value={scholarshipSubtitle} onChange={(e) => setScholarshipSubtitle(e.target.value)} placeholder="Scholarship Subtitle" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                             </div>
+                                             <div className="space-y-1.5 pt-1">
+                                                  <div className="flex items-center justify-between">
+                                                       <span className="text-[11px] text-gray-500 font-semibold">Scholarship Bullet Points</span>
+                                                       <button type="button" onClick={addScholarshipPoint} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Bullet</button>
+                                                  </div>
+                                                  {scholarshipPoints.map((pt, idx) => (
+                                                       <div key={idx} className="flex gap-2 items-center">
+                                                            <input value={pt} onChange={(e) => updateScholarshipPoint(idx, e.target.value)} placeholder="Bullet point text" className="flex-1 h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <button type="button" onClick={() => removeScholarshipPoint(idx)} className="text-red-500 text-xs">✕</button>
+                                                       </div>
+                                                  ))}
+                                             </div>
+                                        </div>
+
+                                        {/* Upcoming Batches */}
+                                        <div className="bg-white p-3.5 rounded-lg border border-gray-200 space-y-3">
+                                             <p className="text-xs font-bold text-blue-600 uppercase">Upcoming Batches</p>
+                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                  <input value={batchesTitle} onChange={(e) => setBatchesTitle(e.target.value)} placeholder="Batches Section Title" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  <input value={batchesSubtitle} onChange={(e) => setBatchesSubtitle(e.target.value)} placeholder="Batches Subtitle" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                             </div>
+                                             <div className="flex items-center justify-between pt-1">
+                                                  <span className="text-[11px] text-gray-500 font-semibold">Batch Schedules ({batchItems.length})</span>
+                                                  <button type="button" onClick={addBatchItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Batch</button>
+                                             </div>
+                                             {batchItems.map((b, idx) => (
+                                                  <div key={idx} className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2 relative">
+                                                       <button type="button" onClick={() => removeBatchItem(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                                            <input value={b.dayDate || ""} onChange={(e) => updateBatchItemField(idx, "dayDate", e.target.value)} placeholder="Date (01)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <input value={b.month || ""} onChange={(e) => updateBatchItemField(idx, "month", e.target.value)} placeholder="Month (JUN)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <input value={b.title || ""} onChange={(e) => updateBatchItemField(idx, "title", e.target.value)} placeholder="Title (Weekend)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <input value={b.time || ""} onChange={(e) => updateBatchItemField(idx, "time", e.target.value)} placeholder="Time (10:00 AM)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <input value={b.status || ""} onChange={(e) => updateBatchItemField(idx, "status", e.target.value)} placeholder="Status (Upcoming)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       </div>
+                                                  </div>
+                                             ))}
+                                        </div>
+                                   </div>
+
+                                   {/* 4. Course Benefits Cards */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">4. Course Benefits Cards</p>
+                                             <CopySectionSelector
+                                                  sectionName="Course Benefits"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       setBenefitsTag(c.benefitsTag || "");
+                                                       setBenefitsTitle(c.benefitsTitle || "");
+                                                       setBenefitsSubtitle(c.benefitsSubtitle || "");
+                                                       if (c.benefitsCards) setBenefitsCards(JSON.parse(JSON.stringify(c.benefitsCards)));
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                             <input value={benefitsTag} onChange={(e) => setBenefitsTag(e.target.value)} placeholder="Tag (e.g. WHY THIS COURSE)" className={inputClass} />
+                                             <input value={benefitsTitle} onChange={(e) => setBenefitsTitle(e.target.value)} placeholder="Section Title" className={inputClass} />
+                                             <input value={benefitsSubtitle} onChange={(e) => setBenefitsSubtitle(e.target.value)} placeholder="Section Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Benefit Cards ({benefitsCards.length})</span>
+                                             <button type="button" onClick={addBenefitCard} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Benefit Card</button>
+                                        </div>
+                                        {benefitsCards.map((card, idx) => (
+                                             <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                  <button type="button" onClick={() => removeBenefitCard(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                       <input value={card.title || ""} onChange={(e) => updateBenefitCardField(idx, "title", e.target.value)} placeholder="Title" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                       <input value={card.iconName || ""} onChange={(e) => updateBenefitCardField(idx, "iconName", e.target.value)} placeholder="Icon Name (e.g. TrendingUp, ShieldCheck)" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  </div>
+                                                  <textarea value={card.description || ""} onChange={(e) => updateBenefitCardField(idx, "description", e.target.value)} placeholder="Description" rows={2} className="w-full p-2 border border-gray-300 rounded-lg text-xs" />
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 5. Skills You Will Learn */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">5. Skills You Will Learn</p>
+                                             <CopySectionSelector
+                                                  sectionName="Skills You Will Learn"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.skillsYouWillLearn) {
+                                                            setSkillsYouWillLearnTitle(c.skillsYouWillLearn.title || "");
+                                                            setSkillsYouWillLearnItems(c.skillsYouWillLearn.skills ? [...c.skillsYouWillLearn.skills] : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <input value={skillsYouWillLearnTitle} onChange={(e) => setSkillsYouWillLearnTitle(e.target.value)} placeholder="Section Title (e.g. Skills You Will Learn)" className={inputClass} />
+                                        <div className="space-y-2 pt-1">
+                                             <div className="flex items-center justify-between">
+                                                  <span className="text-[11px] font-bold text-gray-500 uppercase">Skill Badges ({skillsYouWillLearnItems.length})</span>
+                                                  <button type="button" onClick={addSkillItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Skill</button>
+                                             </div>
+                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                  {skillsYouWillLearnItems.map((sk, idx) => (
+                                                       <div key={idx} className="flex gap-2 items-center bg-white p-2 rounded-lg border border-gray-200">
+                                                            <input value={sk} onChange={(e) => updateSkillItemField(idx, e.target.value)} placeholder="Skill name (e.g. Wireframing)" className="flex-1 h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                            <button type="button" onClick={() => removeSkillItem(idx)} className="text-red-500 text-xs font-bold">✕</button>
+                                                       </div>
+                                                  ))}
+                                             </div>
+                                        </div>
+                                   </div>
+
+                                   {/* 6. Who Should Enroll */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">6. Who Should Enroll</p>
+                                             <CopySectionSelector
+                                                  sectionName="Who Should Enroll"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.whoShouldEnroll) {
+                                                            setWhoShouldEnrollTitle(c.whoShouldEnroll.title || "");
+                                                            setWhoShouldEnrollSubtitle(c.whoShouldEnroll.subtitle || "");
+                                                            setWhoShouldEnrollItems(c.whoShouldEnroll.items ? JSON.parse(JSON.stringify(c.whoShouldEnroll.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <input value={whoShouldEnrollTitle} onChange={(e) => setWhoShouldEnrollTitle(e.target.value)} placeholder="Title (e.g. Who Should Join)" className={inputClass} />
+                                             <input value={whoShouldEnrollSubtitle} onChange={(e) => setWhoShouldEnrollSubtitle(e.target.value)} placeholder="Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Audience Cards ({whoShouldEnrollItems.length})</span>
+                                             <button type="button" onClick={addWhoShouldEnrollItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Audience Card</button>
+                                        </div>
+                                        {whoShouldEnrollItems.map((item, idx) => (
+                                             <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                  <button type="button" onClick={() => removeWhoShouldEnrollItem(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                       <input value={item.title || ""} onChange={(e) => updateWhoShouldEnrollItemField(idx, "title", e.target.value)} placeholder="Title (e.g. Freshers & Beginners)" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                       <input value={item.iconName || ""} onChange={(e) => updateWhoShouldEnrollItemField(idx, "iconName", e.target.value)} placeholder="Icon Name (e.g. user, briefcase)" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  </div>
+                                                  <textarea value={item.description || ""} onChange={(e) => updateWhoShouldEnrollItemField(idx, "description", e.target.value)} placeholder="Description" rows={2} className="w-full p-2 border border-gray-300 rounded-lg text-xs" />
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 7. Job Roles */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">7. Career Pathways / Job Roles</p>
+                                             <CopySectionSelector
+                                                  sectionName="Job Roles"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.jobRoles) {
+                                                            setJobRolesTag(c.jobRoles.tag || "");
+                                                            setJobRolesTitle(c.jobRoles.title || "");
+                                                            setJobRolesDescription(c.jobRoles.description || "");
+                                                            setJobRolesItems(c.jobRoles.items ? JSON.parse(JSON.stringify(c.jobRoles.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                             <input value={jobRolesTag} onChange={(e) => setJobRolesTag(e.target.value)} placeholder="Tag (e.g. CAREER OUTCOMES)" className={inputClass} />
+                                             <input value={jobRolesTitle} onChange={(e) => setJobRolesTitle(e.target.value)} placeholder="Title" className={inputClass} />
+                                             <input value={jobRolesDescription} onChange={(e) => setJobRolesDescription(e.target.value)} placeholder="Description" className={inputClass} />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Role Steps ({jobRolesItems.length})</span>
+                                             <button type="button" onClick={addJobRoleItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Job Role</button>
+                                        </div>
+                                        {jobRolesItems.map((item, idx) => (
+                                             <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                  <button type="button" onClick={() => removeJobRoleItem(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                                       <input value={item.step || ""} onChange={(e) => updateJobRoleItemField(idx, "step", e.target.value)} placeholder="Step (01)" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                       <input value={item.title || ""} onChange={(e) => updateJobRoleItemField(idx, "title", e.target.value)} placeholder="Role Title (e.g. UI Designer)" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                       <input value={item.iconName || ""} onChange={(e) => updateJobRoleItemField(idx, "iconName", e.target.value)} placeholder="Icon Name" className="h-9 px-3 border border-gray-300 rounded-lg text-xs" />
+                                                  </div>
+                                                  <textarea value={item.description || ""} onChange={(e) => updateJobRoleItemField(idx, "description", e.target.value)} placeholder="Role Description" rows={2} className="w-full p-2 border border-gray-300 rounded-lg text-xs" />
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                       <input value={item.keyFocusTitle || ""} onChange={(e) => updateJobRoleItemField(idx, "keyFocusTitle", e.target.value)} placeholder="Key Focus Header (KEY FOCUS AREAS)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <input value={item.keyFocus || ""} onChange={(e) => updateJobRoleItemField(idx, "keyFocus", e.target.value)} placeholder="Key Focus Content" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                  </div>
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 8. Hiring Partners */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">8. Hiring Partners / Companies</p>
+                                             <CopySectionSelector
+                                                  sectionName="Hiring Partners"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.hiringPartners) {
+                                                            setHiringPartnersTitle(c.hiringPartners.title || "");
+                                                            setHiringPartnersSubtitle(c.hiringPartners.subtitle || "");
+                                                            setHiringPartnersItems(c.hiringPartners.items ? JSON.parse(JSON.stringify(c.hiringPartners.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <input value={hiringPartnersTitle} onChange={(e) => setHiringPartnersTitle(e.target.value)} placeholder="Title (e.g. Our Hiring Partners)" className={inputClass} />
+                                             <input value={hiringPartnersSubtitle} onChange={(e) => setHiringPartnersSubtitle(e.target.value)} placeholder="Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Partner Logos ({hiringPartnersItems.length})</span>
+                                             <button type="button" onClick={addHiringPartnerItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Hiring Partner</button>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             {hiringPartnersItems.map((item, idx) => (
+                                                  <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                       <button type="button" onClick={() => removeHiringPartnerItem(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                       <input value={item.name || ""} onChange={(e) => updateHiringPartnerItemField(idx, "name", e.target.value)} placeholder="Partner Company Name" className="w-full h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <ImageUploader setImage={(file) => updateHiringPartnerItemField(idx, "image", file)} initialImage={item.image} />
+                                                  </div>
+                                             ))}
+                                        </div>
+                                   </div>
+
+                                   {/* 9. Meet The Trainers */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">9. Meet The Trainers / Mentors</p>
+                                             <CopySectionSelector
+                                                  sectionName="Trainers"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.trainers) {
+                                                            setTrainersTitle(c.trainers.title || "");
+                                                            setTrainersSubtitle(c.trainers.subtitle || "");
+                                                            setTrainersItems(c.trainers.items ? JSON.parse(JSON.stringify(c.trainers.items)) : []);
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <input value={trainersTitle} onChange={(e) => setTrainersTitle(e.target.value)} placeholder="Title (e.g. Meet Your Instructors)" className={inputClass} />
+                                             <input value={trainersSubtitle} onChange={(e) => setTrainersSubtitle(e.target.value)} placeholder="Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="flex items-center justify-between pt-2">
+                                             <span className="text-[11px] font-bold text-gray-500 uppercase">Trainer Profiles ({trainersItems.length})</span>
+                                             <button type="button" onClick={addTrainerItem} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Trainer</button>
+                                        </div>
+                                        {trainersItems.map((item, idx) => (
+                                             <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                                  <button type="button" onClick={() => removeTrainerItem(idx)} className="absolute top-2 right-2 text-xs text-red-500 font-bold">✕</button>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                                       <input value={item.name || ""} onChange={(e) => updateTrainerItemField(idx, "name", e.target.value)} placeholder="Trainer Name" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <input value={item.role || ""} onChange={(e) => updateTrainerItemField(idx, "role", e.target.value)} placeholder="Role / Designation" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <input value={item.rating || ""} onChange={(e) => updateTrainerItemField(idx, "rating", e.target.value)} placeholder="Rating (4.9/5)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                  </div>
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                       <input value={item.students || ""} onChange={(e) => updateTrainerItemField(idx, "students", e.target.value)} placeholder="Students Trained (400+)" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <input value={item.linkedin || ""} onChange={(e) => updateTrainerItemField(idx, "linkedin", e.target.value)} placeholder="LinkedIn Profile URL" className="h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                  </div>
+                                                  <textarea value={item.bio || ""} onChange={(e) => updateTrainerItemField(idx, "bio", e.target.value)} placeholder="Trainer Bio / Experience" rows={2} className="w-full p-2 border border-gray-300 rounded-lg text-xs" />
+                                                  <ImageUploader setImage={(file) => updateTrainerItemField(idx, "image", file)} initialImage={item.image} />
+                                             </div>
+                                        ))}
+                                   </div>
+
+                                   {/* 10. Certification Section */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">10. Industry Certification</p>
+                                             <CopySectionSelector
+                                                  sectionName="Certification"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       setCertificationTitle(c.certificationTitle || "");
+                                                       setCertificationSubtitle(c.certificationSubtitle || "");
+                                                       setCertificationBullets(c.certificationBullets ? [...c.certificationBullets] : []);
+                                                       if (c.certificationImage) setCertificationImage(c.certificationImage);
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <input value={certificationTitle} onChange={(e) => setCertificationTitle(e.target.value)} placeholder="Certification Heading" className={inputClass} />
+                                             <input value={certificationSubtitle} onChange={(e) => setCertificationSubtitle(e.target.value)} placeholder="Certification Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="space-y-1.5 pt-1">
+                                             <div className="flex items-center justify-between">
+                                                  <span className="text-[11px] font-bold text-gray-500 uppercase">Certification Features/Bullets ({certificationBullets.length})</span>
+                                                  <button type="button" onClick={addCertificationBullet} className="text-xs text-orange-600 font-bold cursor-pointer">+ Add Bullet</button>
+                                             </div>
+                                             {certificationBullets.map((b, idx) => (
+                                                  <div key={idx} className="flex gap-2 items-center">
+                                                       <input value={b} onChange={(e) => updateCertificationBullet(idx, e.target.value)} placeholder="Feature bullet point" className="flex-1 h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                       <button type="button" onClick={() => removeCertificationBullet(idx)} className="text-red-500 text-xs font-bold">✕</button>
+                                                  </div>
+                                             ))}
+                                        </div>
+                                        <div className="space-y-1 pt-1">
+                                             <label className={labelClass}>Certificate Sample Image Upload</label>
+                                             <ImageUploader setImage={setCertificationImage} initialImage={certificationImage} />
+                                        </div>
+                                   </div>
+
+                                   {/* 11. Ready To Start Journey Banner */}
+                                   <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-200 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-gray-200/60 pb-2">
+                                             <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">11. Ready To Start Journey CTA Banner</p>
+                                             <CopySectionSelector
+                                                  sectionName="Ready To Start"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.readyToStartJourney) {
+                                                            setReadyToStartTitle(c.readyToStartJourney.title || "");
+                                                            setReadyToStartSubtitle(c.readyToStartJourney.subtitle || "");
+                                                            setReadyToStartBtn1Text(c.readyToStartJourney.button1Text || "");
+                                                            setReadyToStartBtn1Link(c.readyToStartJourney.button1Link || "");
+                                                            setReadyToStartBtn2Text(c.readyToStartJourney.button2Text || "");
+                                                            setReadyToStartBtn2Link(c.readyToStartJourney.button2Link || "");
+                                                       }
+                                                  }}
+                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <input value={readyToStartTitle} onChange={(e) => setReadyToStartTitle(e.target.value)} placeholder="Banner Heading (Ready to start...)" className={inputClass} />
+                                             <input value={readyToStartSubtitle} onChange={(e) => setReadyToStartSubtitle(e.target.value)} placeholder="Banner Subtitle" className={inputClass} />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                             <div className="space-y-1">
+                                                  <input value={readyToStartBtn1Text} onChange={(e) => setReadyToStartBtn1Text(e.target.value)} placeholder="Button 1 Label (e.g. Enroll Now)" className="w-full h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                  <input value={readyToStartBtn1Link} onChange={(e) => setReadyToStartBtn1Link(e.target.value)} placeholder="Button 1 Link (#)" className="w-full h-8 px-2 border border-gray-300 rounded text-xs" />
+                                             </div>
+                                             <div className="space-y-1">
+                                                  <input value={readyToStartBtn2Text} onChange={(e) => setReadyToStartBtn2Text(e.target.value)} placeholder="Button 2 Label (e.g. Download Syllabus)" className="w-full h-8 px-2 border border-gray-300 rounded text-xs" />
+                                                  <input value={readyToStartBtn2Link} onChange={(e) => setReadyToStartBtn2Link(e.target.value)} placeholder="Button 2 Link (#)" className="w-full h-8 px-2 border border-gray-300 rounded text-xs" />
+                                             </div>
+                                        </div>
+                                   </div>
+
                                    {/* SEO Configurations */}
                                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2 pt-2">SEO Configurations</p>
 
@@ -1190,6 +2262,19 @@ export default function Courses() {
                                    <div className="border-t border-gray-100 pt-4 space-y-4">
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Short-Term Courses (Slider Section)</p>
+                                             <CopySectionSelector
+                                                  sectionName="Short-Term Courses"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       if (c.shortTerm) {
+                                                            setShortTermTitle(c.shortTerm.title || "");
+                                                            setShortTermDescription(c.shortTerm.description || "");
+                                                            setShortTermItems(c.shortTerm.items ? JSON.parse(JSON.stringify(c.shortTerm.items)) : []);
+                                                       }
+                                                  }}
+                                             />
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-4">
@@ -1301,13 +2386,25 @@ export default function Courses() {
                                    <div className="space-y-4 border-t border-gray-100 pt-4">
                                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Course Curriculum / Syllabus Chapters</p>
-                                             <button
-                                                  type="button"
-                                                  onClick={addChapter}
-                                                  className="inline-flex items-center gap-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                                             >
-                                                  + Add Chapter
-                                             </button>
+                                             <div className="flex items-center gap-2">
+                                                  <CopySectionSelector
+                                                       sectionName="Curriculum / Chapters"
+                                                       courses={courses}
+                                                       currentCourseId={editItem?._id}
+                                                       showToast={showToast}
+                                                       onCopy={(c) => {
+                                                            const sourceChapters = c.chapter || c.sections || [];
+                                                            if (sourceChapters && Array.isArray(sourceChapters)) setChapters(JSON.parse(JSON.stringify(sourceChapters)));
+                                                       }}
+                                                  />
+                                                  <button
+                                                       type="button"
+                                                       onClick={addChapter}
+                                                       className="inline-flex items-center gap-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                                  >
+                                                       + Add Chapter
+                                                  </button>
+                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
@@ -1389,7 +2486,23 @@ export default function Courses() {
 
                                    {/* FAQ Section */}
                                    <div className="space-y-4 border-t border-gray-100 pt-4">
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">Frequently Asked Questions (FAQs)</p>
+                                        <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Frequently Asked Questions (FAQs)</p>
+                                             <CopySectionSelector
+                                                  sectionName="FAQs"
+                                                  courses={courses}
+                                                  currentCourseId={editItem?._id}
+                                                  showToast={showToast}
+                                                  onCopy={(c) => {
+                                                       setFaqTitle(c.faqTitle || "");
+                                                       setFaqStartheading(c.faqStartheading || "");
+                                                       setFaqMidheading(c.faqMidheading || "");
+                                                       setFaqEndheading(c.faqEndheading || "");
+                                                       setFaqDescription(c.faqDescription || "");
+                                                       if (c.faq && Array.isArray(c.faq)) setFaqItems(JSON.parse(JSON.stringify(c.faq)));
+                                                  }}
+                                             />
+                                        </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                              <div className="space-y-1.5">
@@ -1703,11 +2816,211 @@ export default function Courses() {
                     </div>
                )}
 
+               {/* ZOOM MEETING DISPATCH MODAL */}
+               {showMeetModal && (
+                    <div className="fixed inset-0 bg-black/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg p-6 text-white space-y-4 shadow-2xl relative">
+                              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                                   <div>
+                                        <h3 className="font-bold text-lg text-blue-400 flex items-center gap-2">
+                                             Dispatch Zoom Live Meeting
+                                        </h3>
+                                        <p className="text-xs text-zinc-400 mt-0.5">
+                                             {selectedCourseForMeet
+                                                  ? `Target Course: ${selectedCourseForMeet.title}`
+                                                  : "Select a specific course or dispatch to all enrolled students"}
+                                        </p>
+                                   </div>
+                                   <button
+                                        type="button"
+                                        onClick={() => setShowMeetModal(false)}
+                                        className="w-7 h-7 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition"
+                                   >
+                                        ✕
+                                   </button>
+                              </div>
+
+                              {/* Target Course Select Dropdown */}
+                              <div className="space-y-1">
+                                   <label className="text-xs font-bold text-zinc-300">Target Course (Enrolled Access Filter) *</label>
+                                   <select
+                                        value={selectedCourseForMeet?._id || "ALL"}
+                                        onChange={(e) => {
+                                             const val = e.target.value;
+                                             if (val === "ALL") {
+                                                  setSelectedCourseForMeet(null);
+                                             } else {
+                                                  const found = courses.find((c) => String(c._id) === String(val));
+                                                  setSelectedCourseForMeet(found || null);
+                                                  if (found && !meetTitle) {
+                                                       setMeetTitle(`Live Session: ${found.title}`);
+                                                  }
+                                             }
+                                        }}
+                                        className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer font-medium"
+                                   >
+                                        <option value="ALL">All Enrolled Students (Across All Courses)</option>
+                                        {courses.map((c) => (
+                                             <option key={c._id} value={c._id}>
+                                                  {c.title} {c.category ? `(${c.category})` : ""}
+                                             </option>
+                                        ))}
+                                   </select>
+                                   <p className="text-[11px] text-zinc-400 pt-0.5">
+                                        {selectedCourseForMeet
+                                             ? `Strictly sends Zoom link to students enrolled in "${selectedCourseForMeet.title}"`
+                                             : "Sends Zoom link to all registered students"}
+                                   </p>
+                              </div>
+
+                              {/* Topic / Session Title */}
+                              <div className="space-y-1">
+                                   <label className="text-xs font-bold text-zinc-300">Session Topic / Title</label>
+                                   <input
+                                        type="text"
+                                        value={meetTitle}
+                                        onChange={(e) => setMeetTitle(e.target.value)}
+                                        placeholder="e.g. Interactive UI/UX Live Design Review"
+                                        className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                                   />
+                              </div>
+
+                              {/* Auto Generate Button & Zoom Link */}
+                              <div className="space-y-1.5">
+                                   <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold text-zinc-300">Zoom Meeting Link *</label>
+                                        <button
+                                             type="button"
+                                             onClick={handleAutoGenerateZoomLink}
+                                             disabled={generatingZoomApi}
+                                             className="text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded-lg transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                                        >
+                                             {generatingZoomApi ? "Creating Zoom API Meeting..." : "Auto-Generate Real Link"}
+                                        </button>
+                                   </div>
+
+                                   <input
+                                        type="url"
+                                        value={meetUrl}
+                                        onChange={(e) => handleMeetUrlChange(e.target.value)}
+                                        placeholder="https://us04web.zoom.us/j/81234567890?pwd=xxxx"
+                                        className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                                   />
+                              </div>
+
+                              {/* Meeting ID & Passcode */}
+                              <div className="grid grid-cols-2 gap-3">
+                                   <div className="space-y-1">
+                                        <label className="text-[11px] font-bold text-zinc-400">Meeting ID</label>
+                                        <input
+                                             type="text"
+                                             value={zoomMeetingId}
+                                             onChange={(e) => setZoomMeetingId(e.target.value)}
+                                             placeholder="812 3456 7890"
+                                             className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                                        />
+                                   </div>
+                                   <div className="space-y-1">
+                                        <label className="text-[11px] font-bold text-zinc-400">Passcode</label>
+                                        <input
+                                             type="text"
+                                             value={zoomPasscode}
+                                             onChange={(e) => setZoomPasscode(e.target.value)}
+                                             placeholder="Passcode"
+                                             className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                                        />
+                                   </div>
+                              </div>
+
+                              {/* Scheduled Time */}
+                              <div className="space-y-1">
+                                   <label className="text-[11px] font-bold text-zinc-400">Scheduled Time / Status</label>
+                                   <input
+                                        type="text"
+                                        value={scheduledAt}
+                                        onChange={(e) => setScheduledAt(e.target.value)}
+                                        placeholder="e.g. Today at 7:00 PM"
+                                        className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
+                                   />
+                              </div>
+
+                              {/* Instructions (Full Width & Multi-line Textarea) */}
+                              <div className="space-y-1">
+                                   <label className="text-[11px] font-bold text-zinc-400">Instructions / Notes (Optional)</label>
+                                   <textarea
+                                        rows={3}
+                                        value={instructions}
+                                        onChange={(e) => setInstructions(e.target.value)}
+                                        placeholder="e.g. Please keep Figma open before joining the meeting. Ensure stable internet connection."
+                                        className="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 resize-none"
+                                   />
+                              </div>
+
+                              {/* Submit Button */}
+                              <div className="pt-2">
+                                   <button
+                                        type="button"
+                                        onClick={handleSendMeetLink}
+                                        disabled={sendingMeetEmail || !meetUrl}
+                                        className={`w-full py-3 text-black font-extrabold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                                             sendingMeetEmail || !meetUrl
+                                                  ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                                                  : "bg-primary hover:bg-primary-hover text-white"
+                                        }`}
+                                   >
+                                        {sendingMeetEmail ? (
+                                             <>
+                                                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                                                  <span>Dispatching Invites & Saving...</span>
+                                             </>
+                                        ) : (
+                                             <span>Dispatch Live Meeting & Notify Enrolled Students</span>
+                                        )}
+                                   </button>
+                              </div>
+                         </div>
+                    </div>
+               )}
+
                {/* Toast Notification */}
                <div className={`fixed bottom-6 right-6 flex items-center gap-2.5 bg-gray-900 border border-gray-800 text-white px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 z-50 ${toast.show ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"}`}>
                     <span className={`w-2 h-2 rounded-full ${toast.type === "error" ? "bg-red-500" : "bg-emerald-500"} animate-pulse`}></span>
                     <span className="font-semibold text-xs">{toast.message}</span>
                </div>
+          </div>
+     );
+}
+
+function CopySectionSelector({ sectionName, courses, currentCourseId, onCopy, showToast }) {
+     if (!courses || courses.length === 0) return null;
+
+     return (
+          <div className="flex items-center gap-1">
+               <select
+                    defaultValue=""
+                    onChange={(e) => {
+                         const sourceId = e.target.value;
+                         if (!sourceId) return;
+                         const selectedCourse = courses.find((c) => String(c._id) === String(sourceId));
+                         if (selectedCourse) {
+                              onCopy(selectedCourse);
+                              if (showToast) {
+                                   showToast(`Copied ${sectionName} data from "${selectedCourse.title || selectedCourse.coursename || "Selected Course"}"!`);
+                              }
+                         }
+                         e.target.value = "";
+                    }}
+                    className="h-7 px-2 bg-orange-50/80 hover:bg-orange-100 border border-orange-200 focus:border-orange-500 text-orange-700 text-[11px] font-bold rounded-lg shadow-2xs transition-all cursor-pointer outline-none max-w-52"
+               >
+                    <option value="" disabled>
+                         📋 Copy {sectionName} from...
+                    </option>
+                    {courses.map((c) => (
+                         <option key={c._id} value={c._id} disabled={String(c._id) === String(currentCourseId)}>
+                              {c.title || c.coursename || c.slug} {String(c._id) === String(currentCourseId) ? " (Current)" : ""}
+                         </option>
+                    ))}
+               </select>
           </div>
      );
 }
