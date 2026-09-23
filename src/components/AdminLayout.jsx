@@ -20,6 +20,7 @@ import {
      HiOutlineVideoCamera
 } from "react-icons/hi";
 
+
 const navigationItems = [
      { name: "Overview", path: "/", icon: HiOutlineHome },
      { name: "Live Meetings", path: "/live-meetings", icon: HiOutlineVideoCamera },
