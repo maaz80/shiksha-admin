@@ -25,6 +25,8 @@ export default function Courses() {
 
      // Course Form States
      const [title, setTitle] = useState("");
+     const [fees, setFees] = useState("");
+     const [courseLength, setCourseLength] = useState("");
      const [alt, setAlt] = useState("");
      const [startDate, setStartDate] = useState("");
      const [category, setCategory] = useState("");
@@ -509,6 +511,8 @@ export default function Courses() {
 
      const resetForm = () => {
           setTitle("");
+          setFees("");
+          setCourseLength("");
           setAlt("");
           setStartDate("");
           setCategory("");
@@ -598,6 +602,8 @@ export default function Courses() {
           setEditItem(course);
 
           setTitle(course.title || "");
+          setFees(course.fees || course.price || "");
+          setCourseLength(course.courseLength || "");
           setAlt(course.alt || "");
           setStartDate(course.startdate || "");
           setCategory(course.category || "");
@@ -814,6 +820,9 @@ export default function Courses() {
                formData.append("title", title);
                formData.append("category", category);
                formData.append("name", title);
+               formData.append("fees", fees);
+               formData.append("price", fees);
+               formData.append("courseLength", courseLength);
                formData.append("overview", overview);
                formData.append("slug", slug);
                formData.append("seoTitle", seoTitle || title);
@@ -1137,9 +1146,16 @@ export default function Courses() {
 
                                               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                                                    <div className="space-y-2">
-                                                        <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2" title={course.title}>
-                                                             {course.title}
-                                                        </h2>
+                                                        <div className="flex items-start justify-between gap-2">
+                                                             <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2" title={course.title}>
+                                                                  {course.title}
+                                                             </h2>
+                                                             {(course.fees || course.price) && (
+                                                                  <span className="shrink-0 text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg">
+                                                                       ₹{Number(course.price || course.fees).toLocaleString("en-IN")}
+                                                                  </span>
+                                                             )}
+                                                        </div>
                                                         <p className="text-xs text-gray-400 line-clamp-3 leading-normal">
                                                              {course.overview}
                                                         </p>
@@ -1490,6 +1506,29 @@ export default function Courses() {
                                                   value={slug}
                                                   onChange={(e) => setSlug(e.target.value)}
                                                   placeholder="e.g. figma-ui-ux-masterclass"
+                                                  className={inputClass}
+                                             />
+                                        </div>
+                                   </div>
+
+                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                             <label className={labelClass}>Course Fee / Official Price (₹)</label>
+                                             <input
+                                                  type="number"
+                                                  value={fees}
+                                                  onChange={(e) => setFees(e.target.value)}
+                                                  placeholder="e.g. 45000"
+                                                  className={inputClass}
+                                             />
+                                             <p className="text-[10px] text-gray-400">Yeh fee amount CRM pipeline aur ERP ledger/LMS unlock me auto-sync hogi.</p>
+                                        </div>
+                                        <div className="space-y-1.5">
+                                             <label className={labelClass}>Course Duration / Program Length</label>
+                                             <input
+                                                  value={courseLength}
+                                                  onChange={(e) => setCourseLength(e.target.value)}
+                                                  placeholder="e.g. 3 Months / 12 Weeks"
                                                   className={inputClass}
                                              />
                                         </div>
