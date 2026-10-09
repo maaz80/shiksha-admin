@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, Navigate } from "react-router-dom"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Home from "./pages/Home"
 import Blogs from "./pages/Blogs"
@@ -15,7 +15,6 @@ import PolicyData from "./pages/PolicyData"
 import ContactData from "./pages/ContactData"
 import NavbarManager from "./pages/NavbarManager"
 import Testimonials from "./pages/Testimonials"
-import UserAccessManager from "./pages/UserAccessManager"
 import LiveMeetings from "./pages/LiveMeetings"
 import WhatsAppLeads from "./pages/WhatsAppLeads"
 
@@ -35,7 +34,7 @@ const App = () => {
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/' element={protectedPage(<Home />)} />
-        <Route path='/user-access' element={protectedPage(<UserAccessManager />)} />
+        <Route path='/user-access' element={<Navigate to="/" replace />} />
         <Route path='/live-meetings' element={protectedPage(<LiveMeetings />)} />
         <Route path='/whatsapp-leads' element={protectedPage(<WhatsAppLeads />)} />
         <Route path='/blogs' element={protectedPage(<Blogs />)} />
