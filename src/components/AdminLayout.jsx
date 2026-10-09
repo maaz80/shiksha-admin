@@ -23,6 +23,7 @@ import {
 
 const navigationItems = [
      { name: "Overview", path: "/", icon: HiOutlineHome },
+     { name: "WhatsApp Leads", path: "/whatsapp-leads", icon: HiOutlineChatAlt2 },
      { name: "Live Meetings", path: "/live-meetings", icon: HiOutlineVideoCamera },
      { name: "Course Unlock", path: "/user-access", icon: HiOutlineLockOpen },
      { name: "Courses", path: "/courses", icon: HiOutlineAcademicCap },
@@ -154,8 +155,26 @@ export default function AdminLayout({ children }) {
                               </h2>
                          </div>
 
-                         {/* System Badge */}
-                         <div className="flex items-center gap-3">
+                         {/* System Badge & CRM Portal Quick Link */}
+                         <div className="flex items-center gap-2.5">
+                              <a
+                                   href="http://localhost:5174"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 text-xs font-semibold transition"
+                              >
+                                   <span>CRM Desk</span>
+                                   <span className="text-[10px]">↗</span>
+                              </a>
+                              <a
+                                   href="http://localhost:5175"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 text-xs font-semibold transition"
+                              >
+                                   <span>ERP Portal</span>
+                                   <span className="text-[10px]">↗</span>
+                              </a>
                               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-medium">
                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                    <span>System Live</span>
